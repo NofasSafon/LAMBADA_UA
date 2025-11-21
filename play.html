@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PLAY | ЛАМБАДА VIBE & HUB</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vanta/0.5.24/vanta.dots.min.js"></script>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --primary-dark: #0a0a0a;
+            --secondary-dark: #1a1a1a;
+            --accent-red: #dc2626;
+            --text-light: #f5f5f5;
+            --text-muted: #a1a1aa;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--primary-dark);
+            color: var(--text-light);
+            overflow-x: hidden;
+        }
+        
+        .hero-title {
+            font-family: 'Playfair Display', serif;
+            font-weight: 800;
+            font-size: clamp(2.5rem, 6vw, 5rem);
+            line-height: 0.9;
+            letter-spacing: -0.02em;
+        }
+       
+        .section-title {
+            font-family: 'Playfair Display', serif;
+            font-weight: 700;
+            font-size: clamp(1.5rem, 3vw, 2.5rem);
+        }
+        
+        .glass-effect {
+            background: rgba(26, 26, 26, 0.8);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+      
+        .hover-lift {
+            transition: all 0.3s ease;
+        }
+        
+        .hover-lift:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(220, 38, 38, 0.2);
+        }
+        
+        .game-card, .cocktail-card, .insta-card {
+            background: linear-gradient(135deg, rgba(26, 26, 26, 0.9), rgba(10, 10, 10, 0.9));
+            border: 1px solid rgba(220, 38, 38, 0.2);
+            transition: all 0.4s ease;
+        }
+        
+        .game-card:hover, .cocktail-card:hover, .insta-card:hover {
+            border-color: var(--accent-red);
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(220, 38, 38, 0.3);
+        }
+        
+        .text-gradient {
+            background: linear-gradient(135deg, #dc2626, #ef4444, #dc2626);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .nav-bottom {
+            position: fixed;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1000;
+        }
+        
+        .language-switch {
+            position: fixed;
+            top: 2rem;
+            right: 2rem;
+            z-index: 1000;
+        }
+
+        .vanta-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 2;
+        }
+
+        .difficulty-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        
+        .difficulty-easy { background: rgba(34, 197, 94, 0.2); color: #22c55e; }
+        .difficulty-medium { background: rgba(251, 191, 36, 0.2); color: #fbbf24; }
+        .difficulty-hard { background: rgba(220, 38, 38, 0.2); color: #dc2626; }
+
+        /* Instagram specific styles */
+        .insta-overlay {
+            background: rgba(0, 0, 0, 0.6);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        .insta-card:hover .insta-overlay {
+            opacity: 1;
+        }
+        
+        @media (max-width: 768px) {
+            .hero-title { font-size: 2.5rem; }
+            .nav-bottom { bottom: 1rem; }
+            .language-switch { top: 1rem; right: 1rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="language-switch">
+        <button id="lang-ua" class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors">UA</button>
+        <button id="lang-sk" class="px-4 py-2 bg-gray-700 text-white rounded-lg hover:bg-red-700 transition-colors ml-2">SK</button>
+    </div>
+
+    <section class="relative min-h-[60vh] flex items-center justify-center px-4 overflow-hidden">  
+        <div id="vanta-bg" class="vanta-canvas"></div>
+        <div class="hero-content text-center max-w-4xl mx-auto">
+            <div class="hero-title mb-6 text-center">🎲</div>
+            <h1 class="hero-title mb-6 text-gradient">PLAY ZONE</h1>
+            <p class="text-xl text-muted mb-8 max-w-2xl mx-auto">
+                Fast Dopamine Games. Швидкі ігри, відео-гайди та зона для твого контенту.
+            </p>
+            <div class="hero-title mb-4 text-center text-4xl">🍹</div>
+            <h3 class="text-2xl font-bold text-gradient">Cocktail & Game Menu</h3>
+        </div>
+    </section>
+
+    <section class="py-20 px-4">
+        <div class="max-w-7xl mx-auto">
+            <h2 class="section-title text-center mb-16 text-gradient">Ігротека: Level Up</h2>
+            
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                
+                <div class="game-card rounded-2xl p-6 hover-lift">
+                    <div class="aspect-video bg-gray-800 rounded-lg mb-4 overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1611195974226-a6a9be9dd763?q=80&w=800" alt="Checkers" class="w-full h-full object-cover">
+                    </div>
+                    <h3 class="text-xl font-bold mb-2">Шашки (Checkers)</h3>
+                    <p class="text-muted mb-4">Класична дуель розумів. Прорахуй ходи суперника та захопи дошку.</p>
+                    <div class="flex items-center justify-between mb-4">
+                        <span class="difficulty-badge difficulty-medium">Класика</span>
+                        <span class="text-sm text-muted">2 гравці • 30 хв</span>
+                    </div>
+                    <button onclick="showGameDetails('checkers')" class="w-full px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors">
+                        Дізнатися більше
+                    </button>
+                </div>
+
+                <div class="game-card rounded-2xl p-6 hover-lift">
+                    <div class="aspect-video bg-gray-800 rounded-lg mb-4 overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1632501641765-e568d28b0015?q=80&w=800" alt="Alias" class="w-full h-full object-cover">
+                    </div>
+                    <h3 class="text-xl font-bold mb-2">Alias Party</h3>
+                    <p class="text-muted mb-4">Пояснюй слова на швидкість. Ідеально для розігріву великої компанії.</p>
+                    <div class="flex items-center justify-between mb-4">
+                        <span class="difficulty-badge difficulty-easy">Легко</span>
+                        <span class="text-sm text-muted">4+ гравців • 45 хв</span>
+                    </div>
+                    <button onclick="showGameDetails('alias')" class="w-full px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors">
+                        Дізнатися більше
+                    </button>
+                </div>
+
+                <div class="game-card rounded-2xl p-6 hover-lift">
+                    <div class="aspect-video bg-gray-800 rounded-lg mb-4 overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1489850846882-35ef10a4b480?q=80&w=800" alt="Jenga" class="w-full h-full object-cover">
+                    </div>
+                    <h3 class="text-xl font-bold mb-2">Дженга</h3>
+                    <p class="text-muted mb-4">Тест на стійкість рук. Хто завалить вежу — купує наступний раунд шотів.</p>
+                    <div class="flex items-center justify-between mb-4">
+                        <span class="difficulty-badge difficulty-medium">Середньо</span>
+                        <span class="text-sm text-muted">2+ гравців • 15 хв</span>
+                    </div>
+                    <button onclick="showGameDetails('jenga')" class="w-full px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors">
+                        Дізнатися більше
+                    </button>
+                </div>
+
+                <div class="game-card rounded-2xl p-6 hover-lift">
+                    <div class="aspect-video bg-gray-800 rounded-lg mb-4 overflow-hidden">
+                        <img src="img/gUno.jpg" onerror="this.src='https://images.unsplash.com/photo-1570303345338-e1f0eddf4946?q=80&w=800'" class="w-full h-full object-cover">
+                    </div>
+                    <h3 class="text-xl font-bold mb-2">Уно</h3>
+                    <p class="text-muted mb-4">Легендарна карткова гра. Руйнує дружбу, але створює незабутні емоції.</p>
+                    <div class="flex items-center justify-between mb-4">
+                        <span class="difficulty-badge difficulty-easy">Легко</span>
+                        <span class="text-sm text-muted">2-10 гравців • 15 хв</span>
+                    </div>
+                    <button onclick="showGameDetails('uno')" class="w-full px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors">
+                        Дізнатися більше
+                    </button>
+                </div>
+
+                <div class="game-card rounded-2xl p-6 hover-lift">
+                    <div class="aspect-video bg-gray-800 rounded-lg mb-4 overflow-hidden">
+                         <img src="https://images.unsplash.com/photo-1519389950473-47ba0277781c?q=80&w=800" class="w-full h-full object-cover">
+                    </div>
+                    <h3 class="text-xl font-bold mb-2">Мемологія</h3>
+                    <p class="text-muted mb-4">Хто смішніше підпише мем? Гра для тих, хто живе в інтернеті.</p>
+                    <div class="flex items-center justify-between mb-4">
+                        <span class="difficulty-badge difficulty-easy">Ізі</span>
+                        <span class="text-sm text-muted">3-10 гравців • 30 хв</span>
+                    </div>
+                    <button onclick="showGameDetails('memology')" class="w-full px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors">
+                        Дізнатися більше
+                    </button>
+                </div>
+
+                <div class="game-card rounded-2xl p-6 hover-lift">
+                    <div class="aspect-video bg-gray-800 rounded-lg mb-4 overflow-hidden">
+                        <img src="img/gFoot.jpg" onerror="this.src='https://images.unsplash.com/photo-1564053489984-317bb527d1b6?q=80&w=800'" alt="Foosball" class="w-full h-full object-cover">
+                    </div>
+                    <h3 class="text-xl font-bold mb-2">Настільний футбол</h3>
+                    <p class="text-muted mb-4">Динаміка, азарт і гуркіт. Змагайся 1 на 1 або 2 на 2.</p>
+                    <div class="flex items-center justify-between mb-4">
+                        <span class="difficulty-badge difficulty-medium">Активно</span>
+                        <span class="text-sm text-muted">2-4 гравці • ∞ хв</span>
+                    </div>
+                    <button onclick="showGameDetails('foosball')" class="w-full px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors">
+                        Дізнатися більше
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="py-20 px-4 bg-secondary-dark">
+        <div class="max-w-7xl mx-auto">
+            <h2 class="section-title text-center mb-16 text-gradient">Анти-Стрес Коктейлі</h2>
+            
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div class="cocktail-card rounded-2xl p-6 hover-lift">
+                    <div class="aspect-square bg-gray-800 rounded-lg mb-4 overflow-hidden">
+                        <img src="img/kok_1.jpg" onerror="this.src='https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?q=80&w=800'" class="w-full h-full object-cover">
+                    </div>
+                    <h3 class="text-xl font-bold mb-2">Red Vibe</h3>
+                    <p class="text-muted mb-4">
+                        Насичений мікс віскі та вермуту. Вмикає режим "Party" з першого ковтка. Ідеальний вибір для старту гри.
+                    </p>
+                    <button onclick="showCocktailRecipe('red-vibe')" class="w-full px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors">
+                        Рецепт
+                    </button>
+                </div>
+
+                <div class="cocktail-card rounded-2xl p-6 hover-lift">
+                    <div class="aspect-square bg-gray-800 rounded-lg mb-4 overflow-hidden">
+                        <img src="img/kok_2.jpg" onerror="this.src='https://images.unsplash.com/photo-1536935338725-8f319ac6e821?q=80&w=800'" class="w-full h-full object-cover">
+                    </div>
+                    <h3 class="text-xl font-bold mb-2">Lambada Sunset</h3>
+                    <p class="text-muted mb-4">
+                        Тропічний глітч у реальності. Ром, ананас та солодкий гренадин. Виглядає як захід сонця в Маямі, смакує як перемога.
+                    </p>
+                    <button onclick="showCocktailRecipe('lambada-sunset')" class="w-full px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors">
+                        Рецепт
+                    </button>
+                </div>
+
+                <div class="cocktail-card rounded-2xl p-6 hover-lift">
+                    <div class="aspect-square bg-gray-800 rounded-lg mb-4 overflow-hidden">
+                         <img src="img/kok_3.jpg" onerror="this.src='https://images.unsplash.com/photo-1609951651556-5334e2706168?q=80&w=800'" class="w-full h-full object-cover">
+                    </div>
+                    <h3 class="text-xl font-bold mb-2">Stress Killer</h3>
+                    <p class="text-muted mb-4">
+                        Крижаний щит від дедлайнів. Освіжаючий джин з м'ятою. Відновлює ману та охолоджує твій процесор після важкого дня.
+                    </p>
+                    <button onclick="showCocktailRecipe('stress-killer')" class="w-full px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors">
+                        Рецепт
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="py-20 px-4">
+        <div class="max-w-7xl mx-auto">
+            <div class="text-center mb-16">
+                <h2 class="section-title text-gradient">Instagram Gallery</h2>
+                <p class="text-muted mt-4">Live Feed: Кошице, емоції та твої друзі. <a href="https://instagram.com/LAMBADA.kosice" target="_blank" class="text-red-500 hover:underline">@LAMBADA.kosice</a></p>
+            </div>
+            
+            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4" id="insta-grid">
+                </div>
+            
+            <div class="text-center mt-12">
+                <a href="https://instagram.com/LAMBADA.kosice" target="_blank" class="inline-flex items-center px-8 py-4 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-full hover:from-purple-700 hover:to-pink-700 transition-all hover-lift shadow-lg shadow-purple-900/50">
+                    <i class="fab fa-instagram mr-3 text-xl"></i>
+                    Підписатися на LAMBADA
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <nav class="nav-bottom glass-effect rounded-full px-6 py-3">
+        <div class="flex items-center space-x-6">
+            <button onclick="window.location.href='index.html'" class="flex items-center space-x-2 text-gray-400 hover:text-red-400 transition-colors">
+                <i class="fas fa-home"></i>
+                <span class="hidden sm:inline">Головна</span>
+            </button>
+            <button onclick="window.location.href='play.html'" class="flex items-center space-x-2 text-red-500 hover:text-red-400 transition-colors">
+                <i class="fas fa-gamepad"></i>
+                <span class="hidden sm:inline">PLAY</span>
+            </button>
+            <button onclick="window.location.href='vibe.html'" class="flex items-center space-x-2 text-gray-400 hover:text-red-400 transition-colors">
+                <i class="fas fa-music"></i>
+                <span class="hidden sm:inline">VIBE</span>
+            </button>
+            <button onclick="window.location.href='hub.html'" class="flex items-center space-x-2 text-gray-400 hover:text-red-400 transition-colors">
+                <i class="fas fa-users"></i>
+                <span class="hidden sm:inline">HUB</span>
+            </button>
+        </div>
+    </nav>
+
+    <div id="game-modal" class="fixed inset-0 bg-black bg-opacity-70 hidden items-center justify-center z-50">
+        <div class="bg-secondary-dark rounded-2xl p-8 max-w-2xl mx-4 max-h-[90vh] overflow-y-auto relative">
+            <button onclick="closeModal('game-modal')" class="absolute top-4 right-4 text-gray-400 hover:text-white">
+                <i class="fas fa-times text-2xl"></i>
+            </button>
+            <h3 id="game-modal-title" class="text-2xl font-bold text-gradient mb-4"></h3>
+            <div id="game-modal-content"></div>
+        </div>
+    </div>
+
+    <div id="cocktail-modal" class="fixed inset-0 bg-black bg-opacity-70 hidden items-center justify-center z-50">
+        <div class="bg-secondary-dark rounded-2xl p-8 max-w-2xl mx-4 max-h-[90vh] overflow-y-auto relative">
+             <button onclick="closeModal('cocktail-modal')" class="absolute top-4 right-4 text-gray-400 hover:text-white">
+                <i class="fas fa-times text-2xl"></i>
+            </button>
+            <h3 id="cocktail-modal-title" class="text-2xl font-bold text-gradient mb-4"></h3>
+            <div id="cocktail-modal-content"></div>
+        </div>
+    </div>
+
+    <script>
+        // Vanta JS
+        try {
+            VANTA.DOTS({
+                el: "#vanta-bg",
+                mouseControls: true,
+                touchControls: true,
+                gyroControls: false,
+                minHeight: 200.00,
+                minWidth: 200.00,
+                scale: 1.00,
+                scaleMobile: 1.00,
+                color: 0xdc2626,
+                color2: 0xdc2626,
+                backgroundColor: 0x0a0a0a,
+                size: 3.0,
+                spacing: 35.00
+            });
+        } catch(e) { console.log("Vanta JS Error:", e); }
+
+        // --- INSTAGRAM DYNAMIC FEED ---
+        const feedKeywords = [
+            'party,neon', 'kosice,city', 'cocktails,bar', 
+            'nightlife,club', 
+            'music,concert'
+        ];
+
+        function renderInstagramFeed() {
+            const grid = document.getElementById('insta-grid');
+            if (!grid) return;
+            
+            let htmlContent = '';
+            for(let i = 0; i < 8; i++) {
+                const keyword = feedKeywords[i % feedKeywords.length];
+                const randomSeed = Math.floor(Math.random() * 1000);
+                const imgUrl = `https://loremflickr.com/400/400/${keyword}?lock=${randomSeed}`;
+                
+                const likes = Math.floor(Math.random() * 200) + 50;
+                const comments = Math.floor(Math.random() * 20) + 2;
+
+                htmlContent += `
+                <a href="https://instagram.com/LAMBADA.kosice" target="_blank" class="insta-card block relative aspect-square rounded-xl overflow-hidden group cursor-pointer">
+                    <img src="${imgUrl}" alt="Instagram Post" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
+                    <div class="insta-overlay absolute inset-0 flex items-center justify-center gap-6 text-white">
+                        <div class="flex items-center"><i class="fas fa-heart mr-2"></i> ${likes}</div>
+                        <div class="flex items-center"><i class="fas fa-comment mr-2"></i> ${comments}</div>
+                    </div>
+                </a>
+                `;
+            }
+            grid.innerHTML = htmlContent;
+        }
+
+        renderInstagramFeed();
+
+        // --- MODAL LOGIC (Ukrainian) ---
+        const games = {
+            'checkers': {
+                title: 'Шашки (Checkers)',
+                content: `<p class="mb-4">Стара як світ, але завжди актуальна стратегія. Ваша мета — з'їсти всі фігури опонента або заблокувати їх рух.</p>
+                          <ul class="list-disc pl-5 mb-4 text-sm text-muted">
+                            <li><b>Стратегія:</b> Плануй на 2-3 ходи вперед.</li>
+                            <li><b>Дамки:</b> Проривайся на інший бік дошки, щоб отримати "суперсилу".</li>
+                            <li><b>Правило:</b> Якщо можеш бити — мусиш бити!</li>
+                          </ul>
+                          <p class="text-red-400 font-bold">Турнірний формат: Граємо на виліт. Переможець отримує шот.</p>`
+            },
+            'alias': {
+                title: 'Alias Party',
+                content: `<p class="mb-4">Битва красномовства! Твоя мета — пояснити слово своїй команді, не називаючи його прямо. Час тікає!</p>
+                          <p><b>Для кого:</b> Для великих і гучних компаній.</p>
+                          <p><b>Чому це круто:</b> Це найшвидший спосіб розігнати вечірку і посміятися.</p>`
+            },
+            'jenga': {
+                title: 'Дженга',
+                content: `<p class="mb-4">Будуй вежу, поки вона не впаде! Витягуй бруски знизу і клади їх нагору. Руки тремтять? Тоді краще не дихай.</p>
+                          <p class="text-red-400 font-bold">Правило бару LAMBADA: Хто завалив вежу — купує наступний раунд для столу!</p>`
+            },
+            'uno': {
+                title: 'UNO',
+                content: `<p class="mb-4">Кидай карти, змінюй кольори, змушуй друзів брати +4 карти. Мета проста — позбутися всього, що в руках.</p>
+                          <p><b>Обережно:</b> Ця гра може зруйнувати навіть найміцнішу дружбу (жарт... або ні).</p>`
+            },
+             'memology': {
+                title: 'Мемологія',
+                content: `<p class="mb-4">Ти майстер мемів? Доведи це! Ведучий показує картинку, а гравці кидають найсмішніші підписи. Перемагає той, хто змусить стіл реготати.</p>
+                          <p><b>Ідеально для:</b> Тих, хто 24/7 сидить у ТікТоці.</p>`
+            },
+             'foosball': {
+                title: 'Кікер (Футбол)',
+                content: `<p class="mb-4">Настільний футбол — це спорт барів №1. Крути ручки, забивай голи, захищай ворота.</p>
+                          <p><b>Правила:</b> Граємо до 10 голів. "Вертушки" (крутити гравців на 360 градусів) заборонені!</p>`
+            }
+        };
+
+        const cocktails = {
+            'red-vibe': {
+                title: 'Red Vibe',
+                content: `<p class="mb-2 text-gray-400">Міцний • Гірко-солодкий</p>
+                          <ul class="list-disc pl-5 mb-4 text-sm text-white">
+                            <li>Віскі (50 мл)</li>
+                            <li>Червоний вермут (20 мл)</li>
+                            <li>Біттер / Кампарі (10 мл)</li>
+                          </ul>
+                          <p class="text-muted">Класика з характером. Змішується з льодом, подається з впевненістю.</p>`
+            },
+            'lambada-sunset': {
+                title: 'Lambada Sunset',
+                content: `<p class="mb-2 text-gray-400">Солодкий • Фруктовий</p>
+                          <ul class="list-disc pl-5 mb-4 text-sm text-white">
+                            <li>Білий Ром (50 мл)</li>
+                            <li>Ананасовий сік (100 мл)</li>
+                            <li>Гренадин (15 мл)</li>
+                            <li>Лайм</li>
+                          </ul>
+                          <p class="text-muted">Створює ефект градієнта (Tequila Sunrise style). Пити через трубочку, знімати в Stories.</p>`
+            },
+            'stress-killer': {
+                title: 'Stress Killer',
+                content: `<p class="mb-2 text-gray-400">Освіжаючий • Трав'яний</p>
+                          <ul class="list-disc pl-5 mb-4 text-sm text-white">
+                            <li>Джин (50 мл)</li>
+                            <li>Свіжа м'ята</li>
+                            <li>Огірок (слайси)</li>
+                            <li>Тонік</li>
+                          </ul>
+                          <p class="text-muted">Миттєве охолодження системи. Ідеальний баланс свіжості та градусу.</p>`
+            }
+        };
+
+        function showGameDetails(id) {
+            if(games[id]) {
+                document.getElementById('game-modal-title').innerText = games[id].title;
+                document.getElementById('game-modal-content').innerHTML = games[id].content;
+                document.getElementById('game-modal').classList.remove('hidden');
+                document.getElementById('game-modal').classList.add('flex');
+            }
+        }
+
+        function showCocktailRecipe(id) {
+            if(cocktails[id]) {
+                document.getElementById('cocktail-modal-title').innerText = cocktails[id].title;
+                document.getElementById('cocktail-modal-content').innerHTML = cocktails[id].content;
+                document.getElementById('cocktail-modal').classList.remove('hidden');
+                document.getElementById('cocktail-modal').classList.add('flex');
+            }
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).classList.add('hidden');
+            document.getElementById(id).classList.remove('flex');
+        }
+
+        window.onclick = function(event) {
+            if (event.target.classList.contains('fixed')) {
+                event.target.classList.add('hidden');
+                event.target.classList.remove('flex');
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LAMBADA | Digital Energy Bar & Community Hub</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vanta/0.5.24/vanta.birds.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --primary-dark: #0a0a0a;
+            --secondary-dark: #1a1a1a;
+            --accent-red: #dc2626;
+            --text-light: #f5f5f5;
+            --text-muted: #a1a1aa;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--primary-dark);
+            color: var(--text-light);
+            overflow-x: hidden;
+        }
+        
+        .hero-title {
+            font-family: 'Playfair Display', serif;
+            font-weight: 800;
+            font-size: clamp(3rem, 8vw, 8rem);
+            line-height: 0.9;
+            letter-spacing: -0.02em;
+        }
+        
+        .hero-subtitle {
+            font-family: 'Inter', sans-serif;
+            font-weight: 300;
+            font-size: clamp(1rem, 2.5vw, 1.5rem);
+            letter-spacing: 0.05em;
+        }
+        
+        .section-title {
+            font-family: 'Playfair Display', serif;
+            font-weight: 700;
+            font-size: clamp(2rem, 5vw, 4rem);
+        }
+        
+        .vanta-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+        
+        .hero-content {
+            position: relative;
+            z-index: 2;
+        }
+        
+        .glass-effect {
+            background: rgba(26, 26, 26, 0.8);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .hover-lift {
+            transition: all 0.3s ease;
+        }
+        
+        .hover-lift:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 25px 50px rgba(220, 38, 38, 0.2);
+        }
+        
+        .pulse-glow {
+            animation: pulse-glow 2s ease-in-out infinite alternate;
+        }
+        
+        @keyframes pulse-glow {
+            from { box-shadow: 0 0 20px rgba(220, 38, 38, 0.3); }
+            to { box-shadow: 0 0 40px rgba(220, 38, 38, 0.6); }
+        }
+        
+        .text-gradient {
+            background: linear-gradient(135deg, #dc2626, #ef4444, #dc2626);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .language-switch {
+            position: fixed;
+            top: 2rem;
+            right: 2rem;
+            z-index: 1000;
+        }
+        
+        .nav-bottom {
+            position: fixed;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1000;
+        }
+        
+        .pillar-card {
+            background: linear-gradient(135deg, rgba(26, 26, 26, 0.9), rgba(10, 10, 10, 0.9));
+            border: 1px solid rgba(220, 38, 38, 0.2);
+            transition: all 0.4s ease;
+        }
+        
+        .pillar-card:hover {
+            border-color: var(--accent-red);
+            transform: translateY(-15px);
+            box-shadow: 0 30px 60px rgba(220, 38, 38, 0.3);
+        }
+        
+        .instagram-feed {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+        }
+        
+        .instagram-item {
+            aspect-ratio: 1;
+            background: var(--secondary-dark);
+            border-radius: 0.5rem;
+            overflow: hidden;
+            position: relative;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+        
+        .instagram-item:hover {
+            transform: scale(1.05);
+        }
+        
+        .instagram-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .instagram-overlay {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .instagram-item:hover .instagram-overlay {
+            opacity: 1;
+        }
+        
+        /* New Dynamic Grid Styles */
+        .insta-card {
+            display: block;
+            position: relative;
+            aspect-ratio: 1;
+            border-radius: 0.75rem;
+            overflow: hidden;
+            cursor: pointer;
+        }
+        .insta-card img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s;
+        }
+        .insta-card:hover img {
+            transform: scale(1.1);
+        }
+        .insta-overlay-dynamic {
+            position: absolute;
+            inset: 0;
+            background: rgba(0,0,0,0.6);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 1rem;
+            opacity: 0;
+            transition: opacity 0.3s;
+            color: white;
+        }
+        .insta-card:hover .insta-overlay-dynamic {
+            opacity: 1;
+        }
+
+        @media (max-width: 768px) {
+            .hero-title { font-size: 3rem; }
+            .hero-subtitle { font-size: 1rem; }
+            .nav-bottom { bottom: 1rem; }
+            .language-switch { top: 1rem; right: 1rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="language-switch">
+        <button id="lang-ua" class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors">UA</button>
+        <button id="lang-sk" class="px-4 py-2 bg-gray-700 text-white rounded-lg hover:bg-red-700 transition-colors ml-2">SK</button>
+    </div>
+
+    <section class="relative min-h-screen flex items-center justify-center overflow-hidden">
+        <div id="vanta-bg" class="vanta-canvas"></div>
+        
+        <div class="hero-content text-center px-4 max-w-6xl mx-auto">
+             <h1 class="hero-title mb-6">
+                <span class="text-gradient">LAMBADA</span><br>
+                <div class="flex justify-center mb-4"><img src="img/la.jpg" alt="Logo" class="h-24 rounded-full border-2 border-red-600"></div>
+                <span class="text-white text-4xl md:text-6xl">Digital Energy Bar</span>
+            </h1>
+            
+            <p class="hero-subtitle text-white mb-4 text-xl md:text-2xl font-bold">
+                Your Vibe. Your Rules. Your Place.
+            </p>
+
+            <p class="hero-subtitle text-muted mb-8 max-w-3xl mx-auto">
+                Сучасний простір для спільноти UA/SK<br>
+                Digital Energy • Ігровий майданчик • Соціальний Хаб
+            </p>
+            
+            <div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
+                <button onclick="window.location.href='play.html'" class="px-8 py-4 bg-red-600 text-white rounded-full hover:bg-red-700 transition-all hover-lift pulse-glow">
+                    🎲 PLAY
+                </button>
+                <button onclick="window.location.href='vibe.html'" class="px-8 py-4 bg-gray-800 text-white rounded-full hover:bg-red-600 transition-all hover-lift">
+                    ✨ VIBE
+                </button>
+                <button onclick="window.location.href='hub.html'" class="px-8 py-4 bg-gray-800 text-white rounded-full hover:bg-red-600 transition-all hover-lift">
+                    🌐 HUB
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <section class="py-20 px-4">
+        <div class="max-w-7xl mx-auto">
+            <h2 class="section-title text-center mb-16 text-gradient">Три виміри LAMBADA</h2>
+            
+            <div class="grid md:grid-cols-3 gap-8">
+                <div class="pillar-card rounded-2xl p-8 hover-lift">
+                    <div class="text-6xl mb-6 text-center">🎲</div>
+                    <h3 class="text-3xl font-bold mb-4 text-center text-gradient">PLAY</h3>
+                    <p class="text-muted mb-6 text-center">Fast Dopamine / Level Up</p>
+                    
+                    <div class="space-y-4">
+                        <div class="flex items-center space-x-3">
+                            <i class="fas fa-chess text-red-500"></i>
+                            <span>Checkers & Alias</span>
+                        </div>
+                        <div class="flex items-center space-x-3">
+                             <i class="fas fa-cocktail text-red-500"></i>
+                            <span>Insta-Ready Drinks</span>
+                        </div>
+                        <div class="flex items-center space-x-3">
+                            <i class="fas fa-trophy text-red-500"></i>
+                            <span>Турніри & Призи</span>
+                        </div>
+                    </div>
+                    
+                    <button onclick="window.location.href='play.html'" class="w-full mt-6 px-6 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors">
+                        ➡️ Вривайся у гру
+                    </button>
+                </div>
+
+                <div class="pillar-card rounded-2xl p-8 hover-lift">
+                    <div class="text-6xl mb-6 text-center">✨</div>
+                    <h3 class="text-3xl font-bold mb-4 text-center text-gradient">VIBE</h3>
+                    <p class="text-muted mb-6 text-center">Digital Energy / Саундтрек</p>
+                    
+                    <div class="space-y-4">
+                        <div class="flex items-center space-x-3">
+                            <i class="fas fa-music text-red-500"></i>
+                            <span>Tech House & Lounge</span>
+                        </div>
+                        <div class="flex items-center space-x-3">
+                            <i class="fas fa-bolt text-red-500"></i>
+                            <span>RGB Aesthetic</span>
+                        </div>
+                        <div class="flex items-center space-x-3">
+                        <i class="fas fa-mobile-alt text-red-500"></i>
+                            <span>Content Zone</span>   
+                        </div>
+                    </div>
+                    
+                    <button onclick="window.location.href='vibe.html'" class="w-full mt-6 px-6 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors">
+                        ➡️ Відчуй ритм
+                    </button>
+                </div>
+
+                <div class="pillar-card rounded-2xl p-8 hover-lift">
+                    <div class="text-6xl mb-6 text-center">🌐</div>
+                    <h3 class="text-3xl font-bold mb-4 text-center text-gradient">HUB</h3>
+                    <p class="text-muted mb-6 text-center">Connect & Create</p>
+                    
+                    <div class="space-y-4">
+                        <div class="flex items-center space-x-3">
+                            <i class="fas fa-handshake text-red-500"></i>
+                            <span>Нетворкінг</span>
+                        </div>
+                        <div class="flex items-center space-x-3">
+                            <i class="fas fa-calendar-alt text-red-500"></i>
+                            <span>Календар Подій</span>
+                        </div>
+                        <div class="flex items-center space-x-3">
+                            <i class="fas fa-users text-red-500"></i>
+                            <span>UA/SK Спільнота</span>
+                        </div>
+                    </div>
+                    
+                    <button onclick="window.location.href='hub.html'" class="w-full mt-6 px-6 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors">
+                        ➡️ Знайди своїх
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="py-20 px-4 bg-secondary-dark">
+        <div class="max-w-7xl mx-auto">
+            <h2 class="section-title text-center mb-16 text-gradient">Наш Instagram</h2>
+            <p class="text-center text-muted mb-12 max-w-3xl mx-auto">
+                Слідкуйте за нами в Instagram <a href="https://instagram.com/lambada.kosice" class="text-red-500 hover:underline">@lambada_ua</a> 
+                та використовуйте хештег <span class="text-red-500">#LAMBADA.Kosice</span>. 
+                <br>Локація: <a href="https://maps.app.goo.gl/dGif3oTyHX9NQU5P8" class="text-blue-500 hover:underline">Mäsiarska 50, 040 01 Košice</a>
+            </p>
+            
+            <div class="instagram-feed mb-12">
+                <div class="instagram-item">
+                    <img src="img/KOSH_1.jpg" alt="Nightlife">
+                    <div class="instagram-overlay">
+                        <div class="text-center">
+                            <i class="fab fa-instagram text-3xl text-white mb-2"></i>
+                            <p class="text-white">Нічне життя</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="instagram-item">
+                    <img src="img/play_4.jpg" alt="Board Games">
+                    <div class="instagram-overlay">
+                        <div class="text-center">
+                            <i class="fab fa-instagram text-3xl text-white mb-2"></i>
+                            <p class="text-white">Ігри</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="instagram-item">
+                    <img src="img/vibe_2.jpg" alt="Cocktails">
+                    <div class="instagram-overlay">
+                        <div class="text-center">
+                            <i class="fab fa-instagram text-3xl text-white mb-2"></i>
+                            <p class="text-white">Коктейлі</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="instagram-item">
+                    <img src="img/hub_2.jpg" alt="Music">
+                    <div class="instagram-overlay">
+                        <div class="text-center">
+                            <i class="fab fa-instagram text-3xl text-white mb-2"></i>
+                            <p class="text-white">Музика</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="py-20 px-4">
+        <div class="max-w-7xl mx-auto">
+            <div class="text-center mb-16">
+                <h2 class="section-title text-gradient">Live Feed</h2>
+                <p class="text-muted mt-4">Настрій міста та наших гостей. Оновлюється щомиті.</p>
+            </div>
+            
+            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4" id="insta-grid">
+                </div>
+            
+            <div class="text-center mt-12">
+                <a href="https://instagram.com/LAMBADA.kosice" target="_blank" class="inline-flex items-center px-8 py-4 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-full hover:from-purple-700 hover:to-pink-700 transition-all hover-lift">
+                    <i class="fab fa-instagram mr-3"></i>
+                    Підписатися
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <nav class="nav-bottom glass-effect rounded-full px-6 py-3">
+        <div class="flex items-center space-x-6">
+            <button onclick="window.location.href='index.html'" class="flex items-center space-x-2 text-red-500 hover:text-red-400 transition-colors">
+                <i class="fas fa-home"></i>
+                <span class="hidden sm:inline">Головна</span>
+            </button>
+            <button onclick="window.location.href='play.html'" class="flex items-center space-x-2 text-gray-400 hover:text-red-400 transition-colors">
+                <i class="fas fa-gamepad"></i>
+                <span class="hidden sm:inline">PLAY</span>
+            </button>
+            <button onclick="window.location.href='vibe.html'" class="flex items-center space-x-2 text-gray-400 hover:text-red-400 transition-colors">
+                <i class="fas fa-music"></i>
+                <span class="hidden sm:inline">VIBE</span>
+            </button>
+            <button onclick="window.location.href='hub.html'" class="flex items-center space-x-2 text-gray-400 hover:text-red-400 transition-colors">
+                <i class="fas fa-users"></i>
+                <span class="hidden sm:inline">HUB</span>
+            </button>
+        </div>
+    </nav>
+
+    <script>
+        // Initialize Vanta.js (Birds Effect)
+        try {
+            VANTA.BIRDS({
+                el: "#vanta-bg",
+                mouseControls: true,
+                touchControls: true,
+                gyroControls: false,
+                minHeight: 200.00,
+                minWidth: 200.00,
+                scale: 1.00,
+                scaleMobile: 1.00,
+                backgroundColor: 0x0a0a0a,
+                color1: 0xdc2626, 
+                color2: 0x1a1a1a,
+                colorMode: "variance",
+                birdSize: 1.20,
+                wingSpan: 25.00,
+                speedLimit: 4.00,
+                separation: 20.00,
+                alignment: 20.00,
+                cohesion: 20.00,
+                quantity: 3.00
+            });
+        } catch(e) { console.log("Vanta JS Error:", e); }
+
+        // --- DYNAMIC FEED LOGIC ---
+        const feedKeywords = [
+            'kosice,city', 'cocktails,bar',''
+        ];
+
+        function renderDynamicFeed() {
+            const grid = document.getElementById('insta-grid');
+            if (!grid) return;
+            
+            let htmlContent = '';
+            for(let i = 0; i < 8; i++) {
+                const keyword = feedKeywords[i % feedKeywords.length];
+                const randomSeed = Math.floor(Math.random() * 1000);
+                const imgUrl = `https://loremflickr.com/400/400/${keyword}?lock=${randomSeed}`;
+                
+                const likes = Math.floor(Math.random() * 200) + 50;
+                const comments = Math.floor(Math.random() * 20) + 2;
+
+                htmlContent += `
+                <a href="https://instagram.com/LAMBADA.kosice" target="_blank" class="insta-card">
+                    <img src="${imgUrl}" alt="Live Feed">
+                    <div class="insta-overlay-dynamic">
+                        <div><i class="fas fa-heart mr-2"></i> ${likes}</div>
+                        <div><i class="fas fa-comment mr-2"></i> ${comments}</div>
+                    </div>
+                </a>
+                `;
+            }
+            grid.innerHTML = htmlContent;
+        }
+
+        renderDynamicFeed();
+
+        // Language Switch (Visual)
+        document.getElementById('lang-ua').addEventListener('click', function() {
+            this.classList.add('bg-red-600');
+            this.classList.remove('bg-gray-700');
+            document.getElementById('lang-sk').classList.add('bg-gray-700');
+            document.getElementById('lang-sk').classList.remove('bg-red-600');
+        });
+
+        document.getElementById('lang-sk').addEventListener('click', function() {
+            this.classList.add('bg-red-600');
+            this.classList.remove('bg-gray-700');
+            document.getElementById('lang-ua').classList.add('bg-gray-700');
+            document.getElementById('lang-ua').classList.remove('bg-red-600');
+        });
+
+        // Navigation Scroll Effect
+        window.addEventListener('scroll', function() {
+            const nav = document.querySelector('.nav-bottom');
+            if (window.scrollY > 100) {
+                nav.style.opacity = '0.9';
+            } else {
+                nav.style.opacity = '1';
+            }
+        });
+    </script>
+</body>
+</html>

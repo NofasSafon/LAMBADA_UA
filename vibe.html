@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VIBE | LAMBADA Digital Energy</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vanta/0.5.24/vanta.waves.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --primary-dark: #0a0a0a;
+            --secondary-dark: #1a1a1a;
+            --accent-red: #dc2626;
+            --text-light: #f5f5f5;
+            --text-muted: #a1a1aa;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--primary-dark);
+            color: var(--text-light);
+            overflow-x: hidden;
+        }
+        
+        .hero-title {
+            font-family: 'Playfair Display', serif;
+            font-weight: 800;
+            font-size: clamp(2.5rem, 6vw, 5rem);
+            line-height: 0.9;
+            letter-spacing: -0.02em;
+        }
+        
+        .section-title {
+            font-family: 'Playfair Display', serif;
+            font-weight: 700;
+            font-size: clamp(1.5rem, 3vw, 2.5rem);
+        }
+        
+        .glass-effect {
+            background: rgba(26, 26, 26, 0.8);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .hover-lift {
+            transition: all 0.3s ease;
+        }
+        
+        .hover-lift:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(220, 38, 38, 0.2);
+        }
+        
+        .style-card {
+            background: linear-gradient(135deg, rgba(26, 26, 26, 0.9), rgba(10, 10, 10, 0.9));
+            border: 1px solid rgba(220, 38, 38, 0.2);
+            transition: all 0.4s ease;
+        }
+        
+        .style-card:hover {
+            border-color: var(--accent-red);
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(220, 38, 38, 0.3);
+        }
+        
+        .text-gradient {
+            background: linear-gradient(135deg, #dc2626, #ef4444, #dc2626);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .nav-bottom {
+            position: fixed;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1000;
+        }
+        
+        .language-switch {
+            position: fixed;
+            top: 2rem;
+            right: 2rem;
+            z-index: 1000;
+        }
+        
+        .vanta-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+        
+        .hero-content {
+            position: relative;
+            z-index: 2;
+        }
+        
+        /* Music Player Styles */
+        .music-player {
+            background: linear-gradient(135deg, rgba(26, 26, 26, 0.95), rgba(10, 10, 10, 0.95));
+            border: 1px solid rgba(220, 38, 38, 0.3);
+            box-shadow: 0 0 40px rgba(220, 38, 38, 0.15);
+        }
+        
+        .progress-container {
+            background: rgba(255, 255, 255, 0.1);
+            height: 4px;
+            border-radius: 2px;
+            overflow: hidden;
+            cursor: pointer;
+        }
+        
+        .progress-fill {
+            background: var(--accent-red);
+            height: 100%;
+            width: 0%;
+            transition: width 0.1s linear;
+            box-shadow: 0 0 10px var(--accent-red);
+        }
+
+        /* Playlist Scrollbar */
+        .playlist-container {
+            max-height: 300px;
+            overflow-y: auto;
+            scrollbar-width: thin;
+            scrollbar-color: var(--accent-red) var(--secondary-dark);
+        }
+        
+        .playlist-container::-webkit-scrollbar {
+            width: 6px;
+        }
+        .playlist-container::-webkit-scrollbar-track {
+            background: var(--secondary-dark);
+        }
+        .playlist-container::-webkit-scrollbar-thumb {
+            background-color: var(--accent-red);
+            border-radius: 20px;
+        }
+
+        .track-item {
+            transition: all 0.2s ease;
+            border-left: 3px solid transparent;
+        }
+
+        .track-item:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .track-item.active {
+            background: rgba(220, 38, 38, 0.1);
+            border-left: 3px solid var(--accent-red);
+        }
+
+        .track-item.active .track-name {
+            color: var(--accent-red);
+            font-weight: bold;
+        }
+        
+        .spotify-embed {
+            border-radius: 12px;
+            background: rgba(26, 26, 26, 0.9);
+            overflow: hidden;
+        }
+        
+        /* Equalizer Animation */
+        .equalizer {
+            display: flex;
+            align-items: flex-end;
+            height: 15px;
+            width: 15px;
+            gap: 2px;
+        }
+        
+        .bar {
+            width: 3px;
+            background-color: var(--accent-red);
+            animation: equalize 1s infinite;
+        }
+        
+        .bar:nth-child(1) { animation-delay: 0.1s; }
+        .bar:nth-child(2) { animation-delay: 0.3s; }
+        .bar:nth-child(3) { animation-delay: 0.5s; }
+        
+        @keyframes equalize {
+            0% { height: 2px; }
+            50% { height: 15px; }
+            100% { height: 2px; }
+        }
+
+        /* Spinning Disc Animation */
+        @keyframes pulse-ring {
+            0% { transform: scale(0.8); box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.7); }
+            70% { transform: scale(1); box-shadow: 0 0 0 10px rgba(220, 38, 38, 0); }
+            100% { transform: scale(0.8); box-shadow: 0 0 0 0 rgba(220, 38, 38, 0); }
+        }
+        
+        .playing-animation {
+            animation: pulse-ring 2s infinite;
+        }
+
+        @media (max-width: 768px) {
+            .hero-title { font-size: 2.5rem; }
+            .nav-bottom { bottom: 1rem; }
+            .language-switch { top: 1rem; right: 1rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="language-switch">
+        <button id="lang-ua" class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors">UA</button>
+        <button id="lang-sk" class="px-4 py-2 bg-gray-700 text-white rounded-lg hover:bg-red-700 transition-colors ml-2">SK</button>
+    </div>
+
+    <section class="relative min-h-[60vh] flex items-center justify-center px-4 overflow-hidden">
+        <div id="vanta-bg" class="vanta-canvas"></div>
+        
+        <div class="hero-content text-center max-w-4xl mx-auto">
+            <div class="hero-title mb-6 text-center">✨</div>
+            <h1 class="hero-title mb-6 text-gradient">VIBE</h1>
+            <p class="text-xl text-muted mb-8 max-w-2xl mx-auto">
+                Digital Energy. RGB Aesthetic. Tech House beats.<br>
+                Атмосфера, що змінюється разом з ритмом міста.
+            </p>
+        </div>
+    </section>
+
+    <section class="py-20 px-4">
+        <div class="max-w-7xl mx-auto">
+            <h2 class="section-title text-center mb-16 text-gradient">ЛАМБАДА Playlist</h2>
+            
+            <div class="grid lg:grid-cols-2 gap-8 max-w-5xl mx-auto">
+                
+                <div class="music-player rounded-2xl p-8 relative overflow-hidden flex flex-col justify-between">
+                    <div class="absolute top-0 right-0 w-64 h-64 bg-red-600 opacity-5 blur-[80px] rounded-full pointer-events-none"></div>
+
+                    <div class="flex items-center space-x-6 mb-8 relative z-10">
+                        <div id="album-art" class="w-32 h-32 bg-gradient-to-br from-red-600 to-purple-600 rounded-2xl flex items-center justify-center transition-all shadow-lg overflow-hidden">
+                            <i class="fas fa-wave-square text-5xl text-white"></i>
+                        </div>
+                        <div class="flex-1 overflow-hidden">
+                            <h3 id="track-title" class="text-2xl font-bold mb-1 truncate">Loading...</h3>
+                            <p id="track-artist" class="text-muted mb-4 truncate">Connecting...</p>
+                            
+                            <div class="progress-container mb-2" id="progress-container">
+                                <div class="progress-fill" id="progress-fill"></div>
+                            </div>
+                            <div class="flex justify-between text-sm text-muted">
+                                <span id="current-time">0:00</span>
+                                <span id="duration">0:00</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-center justify-center space-x-8 relative z-10">
+                        <button id="prev-btn" class="text-gray-400 hover:text-white transition-colors transform hover:scale-110">
+                            <i class="fas fa-step-backward text-2xl"></i>
+                        </button>
+                        <button id="play-btn" class="w-20 h-20 bg-red-600 rounded-full flex items-center justify-center hover:bg-red-700 transition-all hover-lift shadow-[0_0_20px_rgba(220,38,38,0.5)]">
+                            <i class="fas fa-play text-3xl text-white pl-1"></i>
+                        </button>
+                        <button id="next-btn" class="text-gray-400 hover:text-white transition-colors transform hover:scale-110">
+                            <i class="fas fa-step-forward text-2xl"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="music-player rounded-2xl p-6 relative overflow-hidden">
+                    <h3 class="text-lg font-bold mb-4 text-white border-b border-gray-700 pb-2">
+                        <i class="fas fa-list-ul mr-2 text-red-500"></i> Random Music BOX
+                    </h3>
+                    <div class="playlist-container" id="playlist-list">
+                        <p class="text-muted text-center py-4">Завантаження плейлиста з інтернету...</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="text-center mt-12">
+                <div class="spotify-embed p-4 rounded-2xl max-w-2xl mx-auto border border-red-900/30">
+                    <div class="w-full rounded-xl overflow-hidden shadow-2xl">
+                    <iframe data-testid="embed-iframe" style="border-radius:12px" src="https://open.spotify.com/embed/playlist/37i9dQZEVXbNG2KDcFcKOF?utm_source=generator&theme=0" width="100%" height="352" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+                    </div>
+                                    
+                     <p class="text-sm text-muted mt-4 mb-4">Або слухай наші офіційні підбірки:</p>
+                    <div class="flex justify-center gap-4">
+                        <button class="px-6 py-2 bg-[#1DB954] text-black font-bold rounded-full hover:opacity-90 transition">
+                            <i class="fab fa-spotify mr-2"></i> Spotify
+                        </button>
+                        <button class="px-6 py-2 bg-[#FA243C] text-white font-bold rounded-full hover:opacity-90 transition">
+                            <i class="fab fa-apple mr-2"></i> Apple Music
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="py-20 px-4 bg-secondary-dark">
+        <div class="max-w-7xl mx-auto">
+            <h2 class="section-title text-center mb-16 text-gradient">RGB Aesthetic</h2>
+            
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div class="style-card rounded-2xl p-6 hover-lift">
+                    <div class="aspect-square bg-gray-800 rounded-lg mb-4 overflow-hidden group">
+                        <img src="img/styl_2.jpg" alt="Neon Noir" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
+                    </div>
+                    <h3 class="text-xl font-bold mb-2">Neon Noir</h3>
+                    <p class="text-muted mb-4">Темрява, прорізана яскравим неоном.</p>
+                    <button onclick="showStyleDetails('neon-noir')" class="w-full px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors">Детальніше</button>
+                </div>
+
+                <div class="style-card rounded-2xl p-6 hover-lift">
+                    <div class="aspect-square bg-gray-800 rounded-lg mb-4 overflow-hidden group">
+                        <img src="img/KOSH_1.jpg" alt="Glitch Art" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
+                    </div>
+                    <h3 class="text-xl font-bold mb-2">Glitch Protocol</h3>
+                    <p class="text-muted mb-4">Цифрове мистецтво та естетика помилки.</p>
+                    <button onclick="showStyleDetails('glitch-art')" class="w-full px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors">Детальніше</button>
+                </div>
+
+                <div class="style-card rounded-2xl p-6 hover-lift">
+                    <div class="aspect-square bg-gray-800 rounded-lg mb-4 overflow-hidden group">
+                        <img src="img/styl_4.jpg" alt="Future Fashion" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
+                    </div>
+                    <h3 class="text-xl font-bold mb-2">Future Fashion</h3>
+                    <p class="text-muted mb-4">Стиль без правил. Металік, шкіра, неон.</p>
+                    <button onclick="showStyleDetails('future-fashion')" class="w-full px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors">Детальніше</button>
+                </div>
+            </div>
+        </div>
+    </section>
+	<section class="py-20 px-4">
+        <div class="max-w-7xl mx-auto text-center">
+            <h2 class="section-title mb-8 text-gradient">Наш Хештег</h2>
+            <div class="bg-gradient-to-r from-red-600 to-purple-600 rounded-2xl p-12 mb-8 relative overflow-hidden">
+                 <div class="absolute top-0 left-0 w-full h-full bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-20"></div>
+                <h3 class="text-4xl font-bold text-white mb-4 relative z-10">
+				
+				<a href="https://instagram.com/lambada.kosice" target="_blank" class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-full hover:from-purple-700 hover:to-pink-700 transition-all hover-lift">
+                        <i class="fab fa-instagram mr-3"></i>
+                        #LAMBADA.Kosice
+                    </a>
+				</h3>
+				
+                <p class="text-white text-opacity-90 text-lg max-w-2xl mx-auto relative z-10">
+                    Знайди своїх. Відмічай нас. Будь в темі.
+                </p>
+            </div>
+        </div>
+    </section>
+    <nav class="nav-bottom glass-effect rounded-full px-6 py-3">
+        <div class="flex items-center space-x-6">
+            <button onclick="window.location.href='index.html'" class="flex items-center space-x-2 text-gray-400 hover:text-red-400 transition-colors">
+                <i class="fas fa-home"></i><span class="hidden sm:inline">Головна</span>
+            </button>
+            <button onclick="window.location.href='play.html'" class="flex items-center space-x-2 text-gray-400 hover:text-red-400 transition-colors">
+                <i class="fas fa-gamepad"></i><span class="hidden sm:inline">PLAY</span>
+            </button>
+            <button onclick="window.location.href='vibe.html'" class="flex items-center space-x-2 text-red-500 hover:text-red-400 transition-colors">
+                <i class="fas fa-music"></i><span class="hidden sm:inline">VIBE</span>
+            </button>
+            <button onclick="window.location.href='hub.html'" class="flex items-center space-x-2 text-gray-400 hover:text-red-400 transition-colors">
+                <i class="fas fa-users"></i><span class="hidden sm:inline">HUB</span>
+            </button>
+        </div>
+    </nav>
+
+    <div id="style-modal" class="fixed inset-0 bg-black bg-opacity-80 hidden items-center justify-center z-50 backdrop-blur-sm">
+        <div class="bg-secondary-dark rounded-2xl p-8 max-w-2xl mx-4 max-h-[90vh] overflow-y-auto border border-red-900 relative">
+            <button onclick="closeModal('style-modal')" class="absolute top-4 right-4 text-gray-400 hover:text-white">
+                <i class="fas fa-times text-2xl"></i>
+            </button>
+            <h3 id="style-modal-title" class="text-2xl font-bold text-gradient mb-4"></h3>
+            <div id="style-modal-content"></div>
+        </div>
+    </div>
+
+<script>
+        // --- 1. VANTA BACKGROUND ---
+        try {
+            VANTA.WAVES({
+                el: "#vanta-bg",
+                mouseControls: true,
+                touchControls: true,
+                gyroControls: false,
+                minHeight: 200.00,
+                minWidth: 200.00,
+                scale: 1.00,
+                scaleMobile: 1.00,
+                color: 0x0a0a0a,      
+                shininess: 40.00,     
+                waveHeight: 20.00,
+                waveSpeed: 0.50,
+                zoom: 0.8,
+                color: 0x300000       
+            });
+        } catch (e) { console.log("Vanta script issue"); }
+
+        // --- 2. PLAYER LOGIC (Reliable Pool + Random) ---
+        
+        // База перевірених треків (FMA & Royalty Free)
+        const trackPool = [
+            {
+                title: "Night Owl",
+                artist: "Broke For Free",
+                src: "https://files.freemusicarchive.org/storage-freemusicarchive-org/music/WFMU/Broke_For_Free/Directionless_EP/Broke_For_Free_-_01_-_Night_Owl.mp3",
+                cover_color: "from-indigo-900 to-purple-800"
+            },
+            {
+                title: "Enthusiast",
+                artist: "Tours",
+                src: "https://files.freemusicarchive.org/storage-freemusicarchive-org/music/no_curator/Tours/Enthusiast/Tours_-_01_-_Enthusiast.mp3",
+                cover_color: "from-blue-600 to-cyan-600"
+            },
+            {
+                title: "Algorithms",
+                artist: "Chad Crouch",
+                src: "https://files.freemusicarchive.org/storage-freemusicarchive-org/music/ccCommunity/Chad_Crouch/Arps/Chad_Crouch_-_Algorithms.mp3",
+                cover_color: "from-green-600 to-teal-900"
+            },
+            {
+                title: "Shipping Lanes",
+                artist: "Chad Crouch",
+                src: "https://files.freemusicarchive.org/storage-freemusicarchive-org/music/ccCommunity/Chad_Crouch/Arps/Chad_Crouch_-_Shipping_Lanes.mp3",
+                cover_color: "from-red-900 to-orange-800"
+            },
+            {
+                title: "Holo",
+                artist: "Amine Maxwell",
+                src: "https://hypeddit.com/track/sc/8x3t9w", /* Замінено на стабільний лінк нижче */
+                src: "https://files.freemusicarchive.org/storage-freemusicarchive-org/music/ccCommunity/Broke_For_Free/Layers/Broke_For_Free_-_01_-_As_Colorful_As_Ever.mp3",
+                cover_color: "from-pink-600 to-purple-900"
+            },
+            {
+                title: "Something Elated",
+                artist: "Broke For Free",
+                src: "https://files.freemusicarchive.org/storage-freemusicarchive-org/music/WFMU/Broke_For_Free/Something_Elated/Broke_For_Free_-_05_-_Something_Elated.mp3",
+                cover_color: "from-yellow-600 to-red-600"
+            }
+        ];
+
+        let playlist = [];
+        let currentTrackIndex = 0;
+        const audio = new Audio();
+        let isPlaying = false;
+
+        // DOM Elements
+        const playBtn = document.getElementById('play-btn');
+        const prevBtn = document.getElementById('prev-btn');
+        const nextBtn = document.getElementById('next-btn');
+        const progressFill = document.getElementById('progress-fill');
+        const progressContainer = document.getElementById('progress-container');
+        const trackTitle = document.getElementById('track-title');
+        const trackArtist = document.getElementById('track-artist');
+        const currentTimeEl = document.getElementById('current-time');
+        const durationEl = document.getElementById('duration');
+        const albumArt = document.getElementById('album-art');
+        const playlistList = document.getElementById('playlist-list');
+
+        // Initialize Player with Random Selection
+        initRandomPlayer();
+
+        function initRandomPlayer() {
+            // Перемішуємо пул і беремо 4 треки
+            playlist = trackPool.sort(() => 0.5 - Math.random()).slice(0, 4);
+            renderPlaylist();
+            loadTrack(currentTrackIndex);
+        }
+
+        function renderPlaylist() {
+            playlistList.innerHTML = '';
+            playlist.forEach((track, index) => {
+                const isActive = index === currentTrackIndex;
+                const activeClass = isActive ? 'active' : '';
+                
+                const iconHtml = isActive ? 
+                    '<div class="equalizer"><div class="bar"></div><div class="bar"></div><div class="bar"></div></div>' : 
+                    `<span class="text-muted text-sm">${index + 1}</span>`;
+
+                const item = document.createElement('div');
+                item.className = `track-item p-3 mb-2 rounded-lg cursor-pointer flex items-center justify-between ${activeClass}`;
+                item.innerHTML = `
+                    <div class="flex items-center space-x-3 overflow-hidden">
+                        <div class="w-8 flex justify-center items-center">${iconHtml}</div>
+                        <div class="truncate">
+                            <h4 class="text-sm font-bold text-white track-name truncate">${track.title}</h4>
+                            <p class="text-xs text-muted truncate">${track.artist}</p>
+                        </div>
+                    </div>
+                    <div class="text-gray-500 hover:text-white">
+                        <i class="fas fa-play text-xs"></i>
+                    </div>
+                `;
+                item.onclick = () => {
+                    currentTrackIndex = index;
+                    loadTrack(currentTrackIndex);
+                    if(!isPlaying) togglePlay(); else audio.play();
+                    renderPlaylist();
+                };
+                playlistList.appendChild(item);
+            });
+        }
+
+        function loadTrack(index) {
+            if (!playlist[index]) return;
+            const track = playlist[index];
+            audio.src = track.src;
+            trackTitle.innerText = track.title;
+            trackArtist.innerText = track.artist;
+            
+            // Генеруємо градієнтну обкладинку
+            albumArt.className = `w-32 h-32 bg-gradient-to-br ${track.cover_color} rounded-2xl flex items-center justify-center transition-all shadow-lg`;
+            albumArt.innerHTML = `<i class="fas fa-music text-5xl text-white"></i>`;
+            
+            renderPlaylist();
+        }
+
+        function togglePlay() {
+            const icon = playBtn.querySelector('i');
+            if (isPlaying) {
+                audio.pause();
+                icon.classList.remove('fa-pause');
+                icon.classList.add('fa-play');
+            } else {
+                // Обробка помилок відтворення (якщо браузер блокує автоплей)
+                const playPromise = audio.play();
+                if (playPromise !== undefined) {
+                    playPromise.then(_ => {
+                        // Playback started
+                    })
+                    .catch(error => {
+                        console.log("Playback prevented:", error);
+                        isPlaying = false; // Reset state
+                    });
+                }
+                icon.classList.remove('fa-play');
+                icon.classList.add('fa-pause');
+            }
+            isPlaying = !isPlaying;
+            renderPlaylist(); 
+        }
+
+        function prevTrack() {
+            currentTrackIndex--;
+            if (currentTrackIndex < 0) currentTrackIndex = playlist.length - 1;
+            loadTrack(currentTrackIndex);
+            if(isPlaying) audio.play();
+        }
+
+        function nextTrack() {
+            currentTrackIndex++;
+            if (currentTrackIndex > playlist.length - 1) currentTrackIndex = 0;
+            loadTrack(currentTrackIndex);
+            if(isPlaying) audio.play();
+        }
+
+        function updateProgress(e) {
+            const { duration, currentTime } = e.srcElement;
+            if (isNaN(duration)) return;
+            const progressPercent = (currentTime / duration) * 100;
+            progressFill.style.width = `${progressPercent}%`;
+            currentTimeEl.innerText = formatTime(currentTime);
+            durationEl.innerText = formatTime(duration);
+        }
+
+        function setProgress(e) {
+            const width = this.clientWidth;
+            const clickX = e.offsetX;
+            const duration = audio.duration;
+            if (!isNaN(duration)) {
+                audio.currentTime = (clickX / width) * duration;
+            }
+        }
+
+        function formatTime(time) {
+            if (isNaN(time)) return "0:00";
+            const minutes = Math.floor(time / 60);
+            let seconds = Math.floor(time % 60);
+            if (seconds < 10) seconds = `0${seconds}`;
+            return `${minutes}:${seconds}`;
+        }
+
+        // Listeners
+        playBtn.addEventListener('click', togglePlay);
+        prevBtn.addEventListener('click', prevTrack);
+        nextBtn.addEventListener('click', nextTrack);
+        audio.addEventListener('timeupdate', updateProgress);
+        audio.addEventListener('ended', nextTrack); 
+        progressContainer.addEventListener('click', setProgress);
+
+        // --- 3. MODALS & UI LOGIC ---
+        document.getElementById('lang-ua').addEventListener('click', function() {
+            this.classList.add('bg-red-600'); this.classList.remove('bg-gray-700');
+            document.getElementById('lang-sk').classList.add('bg-gray-700'); document.getElementById('lang-sk').classList.remove('bg-red-600');
+        });
+
+        document.getElementById('lang-sk').addEventListener('click', function() {
+            this.classList.add('bg-red-600'); this.classList.remove('bg-gray-700');
+            document.getElementById('lang-ua').classList.add('bg-gray-700'); document.getElementById('lang-ua').classList.remove('bg-red-600');
+        });
+
+        function showStyleDetails(styleId) {
+            const styles = {
+                'neon-noir': { title: 'Neon Noir', content: `<p class="text-muted mb-4">Стиль, натхненний фільмами "Drive" та "Blade Runner".</p>` },
+                'glitch-art': { title: 'Glitch Protocol', content: `<p class="text-muted mb-4">Естетика цифрових помилок.</p>` },
+                'future-fashion': { title: 'Future Fashion', content: `<p class="text-muted mb-4">Металік, шкіра, неон, оверсайз.</p>` }
+            };
+            const style = styles[styleId];
+            if (style) {
+                document.getElementById('style-modal-title').textContent = style.title;
+                document.getElementById('style-modal-content').innerHTML = style.content;
+                document.getElementById('style-modal').classList.remove('hidden');
+                document.getElementById('style-modal').classList.add('flex');
+            }
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.add('hidden');
+            document.getElementById(modalId).classList.remove('flex');
+        }
+        
+        window.onclick = function(event) {
+            if (event.target.classList.contains('fixed')) {
+                event.target.classList.add('hidden');
+                event.target.classList.remove('flex');
+            }
+        }
+    </script>
+</body>
+</html>

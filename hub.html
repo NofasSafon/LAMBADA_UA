@@ -1,0 +1,573 @@
+Faces<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HUB | LAMBADA Connection Point</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vanta/0.5.24/vanta.net.min.js"></script>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --primary-dark: #0a0a0a;
+            --secondary-dark: #1a1a1a;
+            --accent-red: #dc2626;
+            --text-light: #f5f5f5;
+            --text-muted: #a1a1aa;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--primary-dark);
+            color: var(--text-light);
+            overflow-x: hidden;
+        }
+                    
+        .hero-title {
+            font-family: 'Playfair Display', serif;
+            font-weight: 800;
+            font-size: clamp(2.5rem, 6vw, 5rem);
+            line-height: 0.9;
+            letter-spacing: -0.02em;
+        }
+                
+        .section-title {
+            font-family: 'Playfair Display', serif;
+            font-weight: 700;
+            font-size: clamp(1.5rem, 3vw, 2.5rem);
+        }
+        
+        .glass-effect {
+            background: rgba(26, 26, 26, 0.8);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .hover-lift {
+            transition: all 0.3s ease;
+        }
+        
+        .hover-lift:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(220, 38, 38, 0.2);
+        }
+        
+        .event-card, .friendship-card {
+            background: linear-gradient(135deg, rgba(26, 26, 26, 0.9), rgba(10, 10, 10, 0.9));
+            border: 1px solid rgba(220, 38, 38, 0.2);
+            transition: all 0.4s ease;
+        }
+        
+        .event-card:hover, .friendship-card:hover {
+            border-color: var(--accent-red);
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(220, 38, 38, 0.3);
+        }
+        
+        .text-gradient {
+            background: linear-gradient(135deg, #dc2626, #ef4444, #dc2626);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .nav-bottom {
+            position: fixed;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1000;
+        }
+        
+        .language-switch {
+            position: fixed;
+            top: 2rem;
+            right: 2rem;
+            z-index: 1000;
+        }
+        .vanta-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+        
+        .hero-content {
+            position: relative;
+            z-index: 2;
+        }
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 1px;
+            background: var(--secondary-dark);
+            border-radius: 0.5rem;
+            overflow: hidden;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .calendar-day {
+            aspect-ratio: 1;
+            background: var(--primary-dark);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: default;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+        
+        .calendar-day:not(.calendar-header):hover {
+            background: var(--secondary-dark);
+            color: var(--accent-red);
+        }
+        
+        .calendar-day.has-event {
+            background: rgba(220, 38, 38, 0.05);
+            cursor: pointer;
+            font-weight: bold;
+            color: white;
+        }
+
+        .calendar-day.has-event:hover {
+            background: rgba(220, 38, 38, 0.2);
+        }
+        
+        .calendar-day.has-event::after {
+            content: '';
+            position: absolute;
+            bottom: 6px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 6px;
+            height: 6px;
+            background: var(--accent-red);
+            border-radius: 50%;
+            box-shadow: 0 0 8px var(--accent-red);
+        }
+        
+        .calendar-header {
+            background: var(--secondary-dark);
+            color: var(--text-muted);
+            font-weight: 600;
+            font-size: 0.875rem;
+            cursor: default;
+            padding: 10px 0;
+            aspect-ratio: auto;
+        }
+
+        .current-day {
+            border: 1px solid var(--accent-red);
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .event-language {
+            display: inline-block;
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.25rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        
+        .lang-ua { background: rgba(0, 123, 255, 0.2); color: #60a5fa; }
+        .lang-sk { background: rgba(40, 167, 69, 0.2); color: #4ade80; }
+        .lang-both { background: rgba(220, 38, 38, 0.2); color: #f87171; }
+        
+        @media (max-width: 768px) {
+            .hero-title { font-size: 2.5rem; }
+            .nav-bottom { bottom: 1rem; }
+            .language-switch { top: 1rem; right: 1rem; }
+            .calendar-grid { font-size: 0.875rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="language-switch">
+        <button id="lang-ua" class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors">UA</button>
+        <button id="lang-sk" class="px-4 py-2 bg-gray-700 text-white rounded-lg hover:bg-red-700 transition-colors ml-2">SK</button>
+    </div>
+
+    <section class="relative min-h-[60vh] flex items-center justify-center px-4 overflow-hidden">  
+        <div id="vanta-bg" class="vanta-canvas"></div>
+        <div class="hero-content text-center max-w-4xl mx-auto">
+            <div class="hero-title mb-6 text-center">🌐</div>
+            <h1 class="hero-title mb-6 text-gradient">HUB</h1>
+            <p class="text-xl text-muted mb-8 max-w-2xl mx-auto">
+                Connect & Create. Календар подій (UA/SK), Стіна Дружби та точка перетину культур.
+            </p>
+        </div>
+    </section>
+
+    <section class="py-20 px-4">
+        <div class="max-w-7xl mx-auto">
+            <h2 class="section-title text-center mb-16 text-gradient">Календар Подій</h2>
+            
+            <div class="flex items-center justify-between mb-8 max-w-md mx-auto">
+                <button onclick="changeMonth(-1)" class="p-3 bg-secondary-dark rounded-lg hover:bg-red-600 transition-colors text-white">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+                <h3 class="text-2xl font-bold capitalize" id="current-month-display"></h3>
+                <button onclick="changeMonth(1)" class="p-3 bg-secondary-dark rounded-lg hover:bg-red-600 transition-colors text-white">
+                    <i class="fas fa-chevron-right"></i>
+                </button>
+            </div>
+            
+            <div class="calendar-grid mb-12 max-w-4xl mx-auto" id="calendar-grid">
+            </div>
+            
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8" id="events-container">
+                </div>
+        </div>
+    </section>
+
+    <section class="py-20 px-4 bg-secondary-dark">
+        <div class="max-w-7xl mx-auto">
+            <h2 class="section-title text-center mb-16 text-gradient">Стіна Дружби</h2>
+            
+            <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+                <div class="friendship-card rounded-2xl p-4 hover-lift">
+                    <div class="aspect-square bg-gray-800 rounded-lg mb-3 overflow-hidden group">
+                        <img src="img/fr_1.jpg" alt="Friends" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
+                    </div>
+                    <h4 class="font-bold text-center mb-1">Squad Goals</h4>
+                    <p class="text-sm text-muted text-center">POCKET ACES ♥️</p>
+                    <p class="text-xs text-muted text-center mt-2">#LAMBADA.Kosice</p>
+                </div>
+                <div class="friendship-card rounded-2xl p-4 hover-lift">
+                    <div class="aspect-square bg-gray-800 rounded-lg mb-3 overflow-hidden group">
+                        <img src="img/fr_2.jpg" alt="Katrin" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
+                    </div>
+                    <h4 class="font-bold text-center mb-1">Katrin</h4>
+                    <p class="text-sm text-muted text-center">Студентка ТУКЕ</p>
+                    <p class="text-xs text-muted text-center mt-2">#GameNight</p>
+                </div>
+                <div class="friendship-card rounded-2xl p-4 hover-lift">
+                    <div class="aspect-square bg-gray-800 rounded-lg mb-3 overflow-hidden group">
+                        <img src="img/fr_3.jpg" alt="Stefan" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
+                    </div>
+                    <h4 class="font-bold text-center mb-1">Штефан</h4>
+                    <p class="text-sm text-muted text-center">DJ @ LAMBADA</p>
+                    <p class="text-xs text-muted text-center mt-2">#VIBENight</p>
+                </div>
+                <div class="friendship-card rounded-2xl p-4 hover-lift">
+                    <div class="aspect-square bg-gray-800 rounded-lg mb-3 overflow-hidden group">
+                        <img src="img/fr_4.jpg" alt="Tomas" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
+                    </div>
+                    <h4 class="font-bold text-center mb-1">Томаш</h4>
+                    <p class="text-sm text-muted text-center">Гейм-майстер</p>
+                    <p class="text-xs text-muted text-center mt-2">#СтудентVibe</p>
+                </div>
+            </div>
+            
+            <div class="text-center">
+                <h3 class="text-2xl font-bold mb-6">Додайте своє фото!</h3>
+                <p class="text-muted mb-8 max-w-2xl mx-auto">
+                    Робіть фото під час наших заходів, додавайте хештег <span class="text-red-500">#LAMBADA.Kosice</span> 
+                    та потрапляйте на нашу Стіну Дружби!
+                </p>
+                <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                    <a href="https://instagram.com/lambada.kosice" target="_blank" class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-full hover:from-purple-700 hover:to-pink-700 transition-all hover-lift">
+                        <i class="fab fa-instagram mr-3"></i>
+                        Опублікувати фото
+                    </a>
+                    <button onclick="showUploadInstructions()" class="inline-flex items-center px-6 py-3 bg-red-600 text-white rounded-full hover:bg-red-700 transition-all hover-lift">
+                        <i class="fas fa-info-circle mr-3"></i>
+                        Інструкції
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="py-20 px-4">
+        <div class="max-w-7xl mx-auto text-center">
+            <h2 class="section-title mb-8 text-gradient">Наш Хештег</h2>
+            <div class="bg-gradient-to-r from-red-600 to-purple-600 rounded-2xl p-12 mb-8 relative overflow-hidden">
+                 <div class="absolute top-0 left-0 w-full h-full bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-20"></div>
+                <h3 class="text-4xl font-bold text-white mb-4 relative z-10">#LAMBADA.Kosice</h3>
+                <p class="text-white text-opacity-90 text-lg max-w-2xl mx-auto relative z-10">
+                    Знайди своїх. Відмічай нас. Будь в темі.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <nav class="nav-bottom glass-effect rounded-full px-6 py-3">
+        <div class="flex items-center space-x-6">
+            <button onclick="window.location.href='index.html'" class="flex items-center space-x-2 text-gray-400 hover:text-red-400 transition-colors">
+                <i class="fas fa-home"></i><span class="hidden sm:inline">Головна</span>
+            </button>
+            <button onclick="window.location.href='play.html'" class="flex items-center space-x-2 text-gray-400 hover:text-red-400 transition-colors">
+                <i class="fas fa-gamepad"></i><span class="hidden sm:inline">PLAY</span>
+            </button>
+            <button onclick="window.location.href='vibe.html'" class="flex items-center space-x-2 text-gray-400 hover:text-red-400 transition-colors">
+                <i class="fas fa-music"></i><span class="hidden sm:inline">VIBE</span>
+            </button>
+            <button onclick="window.location.href='hub.html'" class="flex items-center space-x-2 text-red-500 hover:text-red-400 transition-colors">
+                <i class="fas fa-users"></i><span class="hidden sm:inline">HUB</span>
+            </button>
+        </div>
+    </nav>
+
+    <div id="event-modal" class="fixed inset-0 bg-black bg-opacity-70 hidden items-center justify-center z-50">
+        <div class="bg-secondary-dark rounded-2xl p-8 max-w-2xl mx-4 max-h-[90vh] overflow-y-auto w-full border border-red-900/50 relative">
+            <button onclick="closeModal('event-modal')" class="absolute top-4 right-4 text-gray-400 hover:text-white">
+                <i class="fas fa-times text-2xl"></i>
+            </button>
+            <h3 id="event-modal-title" class="text-2xl font-bold text-gradient mb-4"></h3>
+            <div id="event-modal-content"></div>
+        </div>
+    </div>
+
+    <div id="instructions-modal" class="fixed inset-0 bg-black bg-opacity-70 hidden items-center justify-center z-50">
+        <div class="bg-secondary-dark rounded-2xl p-8 max-w-2xl mx-4 max-h-[90vh] overflow-y-auto border border-red-900/50 relative">
+             <button onclick="closeModal('instructions-modal')" class="absolute top-4 right-4 text-gray-400 hover:text-white">
+                <i class="fas fa-times text-2xl"></i>
+            </button>
+            <h3 class="text-2xl font-bold text-gradient mb-6">Інструкції для фото</h3>
+            <div class="space-y-4">
+                <p class="text-muted">Щоб ваші фото потрапили на нашу Стіну Дружби:</p>
+                <ol class="text-muted space-y-2 list-decimal pl-5">
+                    <li>Робіть фото під час наших заходів</li>
+                    <li>Додавайте хештег <span class="text-white">#LAMBADA.Kosice</span></li>
+                    <li>Тегайте <span class="text-white">@lambada_kosice</span> в сторіз або постах</li>
+                </ol>
+                <div class="bg-red-600 bg-opacity-20 p-4 rounded-lg">
+                    <p class="text-sm"><strong class="text-red-400">Бонус:</strong> Найкраще фото місяця отримує безкоштовний коктейль!</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 1. EVENT DATA
+        const eventsData = [
+            {
+                id: 'monday-club',
+                title: 'Мовний Клуб UA/SK',
+                date: '2025-11-18',
+                time: '18:00',
+                desc: 'Практика мови без підручників. Тільки живі розмови.',
+                fullDesc: 'Забудь про граматичні вправи. Ми вчимо сленг, обговорюємо тренди та граємо в ігри. Ідеально для тих, хто хоче подолати мовний бар\'єр.',
+                lang: 'UA/SK',
+                langClass: 'lang-both',
+                participants: 15,
+                location: 'Lounge Zone',
+                features: ['Alias двома мовами', 'Сленг-батл', 'Нові знайомства']
+            },
+            {
+                id: 'game-night',
+                title: 'Game Night Tournament',
+                date: '2025-11-20',
+                time: '19:00',
+                desc: 'Битва в "Уно" та "Вибухові кошенята".',
+                fullDesc: 'Серйозний турнір з несерйозних ігор. Головний приз — сертифікат на бар. Приходь з командою або знайди її тут.',
+                lang: 'English/SK',
+                langClass: 'lang-sk',
+                participants: 24,
+                location: 'Play Zone',
+                features: ['Турнірна сітка', 'Безкоштовні снеки', 'Призи переможцям']
+            },
+            {
+                id: 'vibe-night',
+                title: 'Digital VIBE Night',
+                date: '2025-11-25',
+                time: '21:00',
+                desc: 'Tech House, коктейлі та RGB атмосфера.',
+                fullDesc: 'Ніч цифрової енергії. Наші діджеї грають найкращий Tech House та Phonk. Спеціальне меню коктейлів.',
+                lang: 'Music',
+                langClass: 'lang-ua', // Style choice
+                participants: 50,
+                location: 'Bar Area',
+                features: ['DJ Set', 'RGB Light Show', 'Фотограф']
+            }
+        ];
+
+        let currentDate = new Date(2025, 10); // Nov 2025
+
+        // 2. INIT
+        document.addEventListener('DOMContentLoaded', () => {
+            try {
+                VANTA.NET({
+                    el: "#vanta-bg",
+                    mouseControls: true,
+                    touchControls: true,
+                    gyroControls: false,
+                    minHeight: 200.00,
+                    minWidth: 200.00,
+                    scale: 1.00,
+                    scaleMobile: 1.00,
+                    color: 0xdc2626,       // Червоні з'єднання
+                    backgroundColor: 0x0a0a0a, // Темний фон
+                    points: 10.00,
+                    maxDistance: 20.00,
+                    spacing: 16.00
+                });
+            } catch (e) { console.log("Vanta failed to load", e); }
+
+            renderCalendar();
+            renderEventCards();
+        });
+
+        // 3. CALENDAR LOGIC
+        function changeMonth(step) {
+            currentDate.setMonth(currentDate.getMonth() + step);
+            renderCalendar();
+        }
+
+        function renderCalendar() {
+            const grid = document.getElementById('calendar-grid');
+            const monthDisplay = document.getElementById('current-month-display');
+            
+            const days = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Нд'];
+            grid.innerHTML = days.map(day => `<div class="calendar-header">${day}</div>`).join('');
+
+            const monthName = currentDate.toLocaleString('uk-UA', { month: 'long', year: 'numeric' });
+            monthDisplay.textContent = monthName.charAt(0).toUpperCase() + monthName.slice(1);
+
+            const year = currentDate.getFullYear();
+            const month = currentDate.getMonth();
+            const firstDayOfMonth = new Date(year, month, 1).getDay();
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+            const adjustedFirstDay = firstDayOfMonth === 0 ? 6 : firstDayOfMonth - 1;
+
+            // Empty slots
+            for (let i = 0; i < adjustedFirstDay; i++) {
+                grid.innerHTML += `<div class="calendar-day empty opacity-0 pointer-events-none"></div>`;
+            }
+
+            // Days
+            for (let day = 1; day <= daysInMonth; day++) {
+                const dateString = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                const event = eventsData.find(e => e.date === dateString);
+                
+                let className = 'calendar-day';
+                let onClick = '';
+                
+                if (event) {
+                    className += ' has-event';
+                    onClick = `onclick="showEventDetails('${event.id}')"`;
+                }
+                
+                grid.innerHTML += `<div class="${className}" ${onClick}>${day}</div>`;
+            }
+        }
+
+        // 4. RENDER CARDS
+        function renderEventCards() {
+            const container = document.getElementById('events-container');
+            container.innerHTML = '';
+            const sortedEvents = [...eventsData].sort((a, b) => new Date(a.date) - new Date(b.date));
+
+            sortedEvents.forEach(event => {
+                const dateObj = new Date(event.date);
+                const dateStr = dateObj.toLocaleString('uk-UA', { day: 'numeric', month: 'long' });
+                
+                container.innerHTML += `
+                    <div class="event-card rounded-2xl p-6 hover-lift flex flex-col h-full">
+                        <div class="flex items-center justify-between mb-4">
+                            <span class="event-language ${event.langClass}">${event.lang}</span>
+                            <span class="text-sm text-muted">${dateStr}, ${event.time}</span>
+                        </div>
+                        <h3 class="text-xl font-bold mb-2">${event.title}</h3>
+                        <p class="text-muted mb-4 flex-grow">${event.desc}</p>
+                        <div class="flex items-center space-x-4 mb-4 pt-4 border-t border-gray-700">
+                            <div class="flex items-center text-sm text-muted">
+                                <i class="fas fa-users mr-2 text-red-500"></i><span>${event.participants} місць</span>
+                            </div>
+                            <div class="flex items-center text-sm text-muted">
+                                <i class="fas fa-map-marker-alt mr-2 text-red-500"></i><span>${event.location}</span>
+                            </div>
+                        </div>
+                        <button onclick="joinEvent('${event.id}')" class="w-full px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-medium">
+                            Приєднатися
+                        </button>
+                    </div>
+                `;
+            });
+        }
+
+        // 5. MODALS
+        function showEventDetails(eventId) {
+            const event = eventsData.find(e => e.id === eventId);
+            if (!event) return;
+
+            const dateObj = new Date(event.date);
+            const dateStr = dateObj.toLocaleString('uk-UA', { day: 'numeric', month: 'long' });
+            const featuresHTML = event.features.map(f => `<li><i class="fas fa-check text-red-500 mr-2"></i>${f}</li>`).join('');
+
+            const content = `
+                <div class="space-y-4">
+                    <div class="bg-gradient-to-r from-red-900/30 to-transparent p-4 rounded-lg border-l-4 border-red-600">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="event-language ${event.langClass}">${event.lang}</span>
+                            <span class="text-sm text-white font-bold">${dateStr}, ${event.time}</span>
+                        </div>
+                        <p class="text-sm text-gray-200">${event.fullDesc}</p>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <h4 class="font-bold mb-3 text-white">Що буде:</h4>
+                            <ul class="text-sm text-muted space-y-2">
+                                ${featuresHTML}
+                            </ul>
+                        </div>
+                        <div class="bg-secondary-dark p-4 rounded-lg">
+                            <p class="text-sm text-muted mb-2"><i class="fas fa-map-marker-alt mr-2 text-red-500"></i> ${event.location}</p>
+                            <p class="text-sm text-muted"><i class="fas fa-users mr-2 text-red-500"></i> Ліміт: ${event.participants} людей</p>
+                        </div>
+                    </div>
+                    <button onclick="joinEvent('${event.id}')" class="w-full mt-4 px-4 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 font-bold transition-colors shadow-lg shadow-red-900/50">
+                        Забронювати місце
+                    </button>
+                </div>
+            `;
+
+            document.getElementById('event-modal-title').textContent = event.title;
+            document.getElementById('event-modal-content').innerHTML = content;
+            
+            const modal = document.getElementById('event-modal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function joinEvent(eventId) {
+            const event = eventsData.find(e => e.id === eventId);
+            alert(`Ви успішно зареєструвалися на "${event.title}"! \nЧекаємо вас ${event.date} о ${event.time}.`);
+            closeModal('event-modal');
+        }
+
+        function showUploadInstructions() {
+            const modal = document.getElementById('instructions-modal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function closeModal(modalId) {
+            const modal = document.getElementById(modalId);
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        document.addEventListener('click', function(e) {
+            if (e.target.classList.contains('fixed')) {
+                e.target.classList.add('hidden');
+                e.target.classList.remove('flex');
+            }
+        });
+    </script>
+</body>
+</html>
