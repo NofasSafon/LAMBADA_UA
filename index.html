@@ -1,504 +1,383 @@
 <!DOCTYPE html>
-<html lang="uk">
+<html lang="sk">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LAMBADA | Digital Energy Bar & Community Hub</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/vanta/0.5.24/vanta.birds.min.js"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
+    <title>LAMBADA MENU</title>
     <style>
         :root {
-            --primary-dark: #0a0a0a;
-            --secondary-dark: #1a1a1a;
-            --accent-red: #dc2626;
-            --text-light: #f5f5f5;
-            --text-muted: #a1a1aa;
-        }
-        
-        body {
-            font-family: 'Inter', sans-serif;
-            background: var(--primary-dark);
-            color: var(--text-light);
-            overflow-x: hidden;
-        }
-        
-        .hero-title {
-            font-family: 'Playfair Display', serif;
-            font-weight: 800;
-            font-size: clamp(3rem, 8vw, 8rem);
-            line-height: 0.9;
-            letter-spacing: -0.02em;
-        }
-        
-        .hero-subtitle {
-            font-family: 'Inter', sans-serif;
-            font-weight: 300;
-            font-size: clamp(1rem, 2.5vw, 1.5rem);
-            letter-spacing: 0.05em;
-        }
-        
-        .section-title {
-            font-family: 'Playfair Display', serif;
-            font-weight: 700;
-            font-size: clamp(2rem, 5vw, 4rem);
-        }
-        
-        .vanta-canvas {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 1;
-        }
-        
-        .hero-content {
-            position: relative;
-            z-index: 2;
-        }
-        
-        .glass-effect {
-            background: rgba(26, 26, 26, 0.8);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-        
-        .hover-lift {
-            transition: all 0.3s ease;
-        }
-        
-        .hover-lift:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 25px 50px rgba(220, 38, 38, 0.2);
-        }
-        
-        .pulse-glow {
-            animation: pulse-glow 2s ease-in-out infinite alternate;
-        }
-        
-        @keyframes pulse-glow {
-            from { box-shadow: 0 0 20px rgba(220, 38, 38, 0.3); }
-            to { box-shadow: 0 0 40px rgba(220, 38, 38, 0.6); }
-        }
-        
-        .text-gradient {
-            background: linear-gradient(135deg, #dc2626, #ef4444, #dc2626);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-        
-        .language-switch {
-            position: fixed;
-            top: 2rem;
-            right: 2rem;
-            z-index: 1000;
-        }
-        
-        .nav-bottom {
-            position: fixed;
-            bottom: 2rem;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 1000;
-        }
-        
-        .pillar-card {
-            background: linear-gradient(135deg, rgba(26, 26, 26, 0.9), rgba(10, 10, 10, 0.9));
-            border: 1px solid rgba(220, 38, 38, 0.2);
-            transition: all 0.4s ease;
-        }
-        
-        .pillar-card:hover {
-            border-color: var(--accent-red);
-            transform: translateY(-15px);
-            box-shadow: 0 30px 60px rgba(220, 38, 38, 0.3);
-        }
-        
-        .instagram-feed {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 1rem;
-        }
-        
-        .instagram-item {
-            aspect-ratio: 1;
-            background: var(--secondary-dark);
-            border-radius: 0.5rem;
-            overflow: hidden;
-            position: relative;
-            cursor: pointer;
-            transition: transform 0.3s ease;
-        }
-        
-        .instagram-item:hover {
-            transform: scale(1.05);
-        }
-        
-        .instagram-item img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-        
-        .instagram-overlay {
-            position: absolute;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0, 0, 0, 0.7);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
-        
-        .instagram-item:hover .instagram-overlay {
-            opacity: 1;
-        }
-        
-        /* New Dynamic Grid Styles */
-        .insta-card {
-            display: block;
-            position: relative;
-            aspect-ratio: 1;
-            border-radius: 0.75rem;
-            overflow: hidden;
-            cursor: pointer;
-        }
-        .insta-card img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            transition: transform 0.5s;
-        }
-        .insta-card:hover img {
-            transform: scale(1.1);
-        }
-        .insta-overlay-dynamic {
-            position: absolute;
-            inset: 0;
-            background: rgba(0,0,0,0.6);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 1rem;
-            opacity: 0;
-            transition: opacity 0.3s;
-            color: white;
-        }
-        .insta-card:hover .insta-overlay-dynamic {
-            opacity: 1;
+            --bg-color: #121212;
+            --card-bg: #1e1e1e;
+            --text-color: #e0e0e0;
+            --accent-color: #ff9800;
+            --price-color: #ffd700;
         }
 
-        @media (max-width: 768px) {
-            .hero-title { font-size: 3rem; }
-            .hero-subtitle { font-size: 1rem; }
-            .nav-bottom { bottom: 1rem; }
-            .language-switch { top: 1rem; right: 1rem; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+            scroll-behavior: smooth;
+        }
+
+        header {
+            background-color: #000;
+            padding: 20px;
+            text-align: center;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.5);
+            border-bottom: 3px solid var(--accent-color);
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 2.5rem;
+            color: var(--accent-color);
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+
+        nav {
+            background-color: #2c2c2c;
+            overflow-x: auto;
+            white-space: nowrap;
+            padding: 10px 0;
+            position: sticky;
+            top: 85px; /* Adjust based on header height */
+            z-index: 900;
+        }
+
+        nav a {
+            color: #fff;
+            text-decoration: none;
+            padding: 10px 15px;
+            display: inline-block;
+            font-weight: bold;
+            font-size: 0.9rem;
+            transition: 0.3s;
+            border-radius: 20px;
+            margin: 0 5px;
+        }
+
+        nav a:hover, nav a:active {
+            background-color: var(--accent-color);
+            color: #000;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 0 15px;
+            padding-bottom: 80px;
+        }
+
+        .category-title {
+            border-bottom: 2px solid var(--accent-color);
+            padding-bottom: 10px;
+            margin-top: 50px;
+            margin-bottom: 25px;
+            font-size: 2rem;
+            color: var(--accent-color);
+            text-transform: uppercase;
+            text-align: center;
+        }
+
+        .subcategory-title {
+            color: #fff;
+            margin-top: 30px;
+            margin-bottom: 15px;
+            font-size: 1.4rem;
+            padding-left: 15px;
+            border-left: 5px solid var(--accent-color);
+            background: linear-gradient(90deg, #333 0%, transparent 100%);
+            padding: 5px 15px;
+        }
+
+        .menu-item {
+            background-color: var(--card-bg);
+            margin-bottom: 15px;
+            border-radius: 12px;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+            transition: transform 0.2s;
+        }
+        
+        .menu-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(255, 152, 0, 0.1);
+        }
+
+        .menu-item img {
+            width: 90px;
+            height: 90px;
+            object-fit: cover;
+            flex-shrink: 0;
+            border-right: 1px solid #333;
+        }
+
+        .item-details {
+            padding: 10px 15px;
+            flex-grow: 1;
+            min-width: 0; /* Prevents text overflow issues */
+        }
+
+        .item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 4px;
+        }
+
+        .item-name {
+            font-weight: bold;
+            font-size: 1.1rem;
+            color: #fff;
+            line-height: 1.2;
+            padding-right: 10px;
+        }
+
+        .item-price {
+            font-weight: 800;
+            color: var(--price-color);
+            font-size: 1.25rem;
+            white-space: nowrap;
+        }
+
+        .item-meta {
+             font-size: 0.8rem;
+             color: var(--accent-color);
+             display: block;
+             margin-bottom: 4px;
+             font-weight: bold;
+        }
+
+        .item-ingredients {
+            font-size: 0.85rem;
+            color: #bbb;
+            font-style: italic;
+            line-height: 1.3;
+        }
+
+        .set-box {
+            background: linear-gradient(45deg, #2c2c2c, #1a1a1a);
+            padding: 20px;
+            border-radius: 12px;
+            margin: 20px 0;
+            border: 2px solid var(--accent-color);
+            text-align: center;
+        }
+        .set-box h3 { margin-top: 0; color: var(--accent-color); }
+        .set-box p { font-size: 1.1rem; margin: 10px 0; }
+        .set-price { color: var(--price-color); font-weight: bold; font-size: 1.3rem; }
+
+        footer {
+            text-align: center;
+            padding: 40px 20px;
+            background-color: #000;
+            color: #666;
+            margin-top: 50px;
+            border-top: 1px solid #333;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 400px) {
+            .menu-item img { width: 70px; height: 70px; }
+            .item-name { font-size: 1rem; }
+            .item-price { font-size: 1.1rem; }
         }
     </style>
 </head>
 <body>
-    <div class="language-switch">
-        <button id="lang-ua" class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors">UA</button>
-        <button id="lang-sk" class="px-4 py-2 bg-gray-700 text-white rounded-lg hover:bg-red-700 transition-colors ml-2">SK</button>
-    </div>
 
-    <section class="relative min-h-screen flex items-center justify-center overflow-hidden">
-        <div id="vanta-bg" class="vanta-canvas"></div>
+<header>
+    <h1>LYMBADA</h1>
+</header>
+
+<nav>
+    <a href="#cocktails">Cocktails</a>
+    <a href="#shots">Shots</a>
+    <a href="#alcohol">Alkohol</a>
+    <a href="#liqueurs">Likéry</a>
+    <a href="#wine-beer">Víno & Pivo</a>
+    <a href="#soft">Nealko</a>
+    <a href="#snacks">Snacks</a>
+</nav>
+
+<div class="container">
+
+    <section id="cocktails">
+        <h2 class="category-title">1. Cocktails</h2>
+
+        <div class="menu-item"><img src="https://image.pollinations.ai/prompt/Long%20Island%20Iced%20Tea%20cocktail%20drink" alt="Long Island"><div class="item-details"><div class="item-header"><span class="item-name">LONG ISLAND</span><span class="item-price">7,- €</span></div><span class="item-meta">0,3 l</span><div class="item-ingredients">Vodka, biely rum, tequila, gin, triple sec, cukrový sirup, citrón, cola</div></div></div>
+
+        <div class="menu-item"><img src="https://image.pollinations.ai/prompt/Pina%20Colada%20cocktail%20pineapple" alt="Piña Colada"><div class="item-details"><div class="item-header"><span class="item-name">PIÑA COLADA</span><span class="item-price">7,- €</span></div><span class="item-meta">0,3 l</span><div class="item-ingredients">Biely rum, tmavý rum, kokosový sirup, ananás džús, šľahačka</div></div></div>
+
+        <div class="menu-item"><img src="https://image.pollinations.ai/prompt/Cuba%20Libre%20cocktail%20drink" alt="Cubalibre"><div class="item-details"><div class="item-header"><span class="item-name">CUBALIBRE</span><span class="item-price">5,5 €</span></div><span class="item-meta">0,3 l</span><div class="item-ingredients">Biely rum, cola, citrónová šťava, limetka</div></div></div>
+
+        <div class="menu-item"><img src="https://image.pollinations.ai/prompt/Aperol%20Spritz%20orange%20drink" alt="Martini Spritz"><div class="item-details"><div class="item-header"><span class="item-name">MARTINI SPRITZ</span><span class="item-price">6,- €</span></div><span class="item-meta">0,25 l</span><div class="item-ingredients">Martini Fiero, prosecco, soda, pomaranč</div></div></div>
+
+        <div class="menu-item"><img src="https://image.pollinations.ai/prompt/Negroni%20cocktail%20drink" alt="Negroni"><div class="item-details"><div class="item-header"><span class="item-name">NEGRONI</span><span class="item-price">6,- €</span></div><span class="item-meta">0,12 l</span><div class="item-ingredients">Campari, Martini Fiero, gin, pomaranč</div></div></div>
+
+        <div class="menu-item"><img src="https://image.pollinations.ai/prompt/Gin%20Tonic%20lime%20cocktail" alt="Gintonic"><div class="item-details"><div class="item-header"><span class="item-name">GINTONIC</span><span class="item-price">5,5 €</span></div><span class="item-meta">0,3 l</span><div class="item-ingredients">Gin, tonic, limetka</div></div></div>
+
+        <div class="menu-item"><img src="https://image.pollinations.ai/prompt/Fernet%20stock%20tonic%20cocktail" alt="Bavorák"><div class="item-details"><div class="item-header"><span class="item-name">BAVORÁK</span><span class="item-price">5,5 €</span></div><span class="item-meta">0,3 l</span><div class="item-ingredients">Fernet Stock, tonic, limetka</div></div></div>
+
+        <div class="menu-item"><img src="https://image.pollinations.ai/prompt/Becherovka%20tonic%20cocktail" alt="Beton"><div class="item-details"><div class="item-header"><span class="item-name">BETON</span><span class="item-price">5,5 €</span></div><span class="item-meta">0,3 l</span><div class="item-ingredients">Becherovka, tonic, limetka</div></div></div>
+
+        <div class="menu-item"><img src="https://image.pollinations.ai/prompt/Cosmopolitan%20cocktail%20red" alt="Cosmopolitan"><div class="item-details"><div class="item-header"><span class="item-name">COSMOPOLITAN</span><span class="item-price">6,- €</span></div><span class="item-meta">0,12 l</span><div class="item-ingredients">Vodka, triple sec, grenadína, limetka, pomaranč</div></div></div>
+
+        <div class="menu-item"><img src="https://image.pollinations.ai/prompt/White%20Russian%20cocktail" alt="White Russian"><div class="item-details"><div class="item-header"><span class="item-name">WHITE RUSSIAN</span><span class="item-price">5,5 €</span></div><span class="item-meta">0,12 l</span><div class="item-ingredients">Vodka, kávový likér, šľahačka</div></div></div>
+
+        <div class="menu-item"><img src="https://image.pollinations.ai/prompt/Mojito%20cocktail%20mint" alt="Mojito"><div class="item-details"><div class="item-header"><span class="item-name">MOJITO</span><span class="item-price">7,- €</span></div><span class="item-meta">0,3 l</span><div class="item-ingredients">Biely rum, cukrový sirup, sprite, limetka, mäta</div></div></div>
+
+        <div class="menu-item"><img src="https://image.pollinations.ai/prompt/Margarita%20cocktail%20salt%20rim" alt="Margarita"><div class="item-details"><div class="item-header"><span class="item-name">MARGARITA</span><span class="item-price">6,- €</span></div><span class="item-meta">0,12 l</span><div class="item-ingredients">Tequila, triple sec, limetka, soľ</div></div></div>
+
+        <div class="menu-item"><img src="https://image.pollinations.ai/prompt/Old%20Fashioned%20cocktail%20whiskey" alt="Old Fashion"><div class="item-details"><div class="item-header"><span class="item-name">OLD FASHION</span><span class="item-price">5,5 €</span></div><span class="item-meta">0,1 l</span><div class="item-ingredients">Red Walker, Martini Fiero, cukor, višňa</div></div></div>
+
+        <div class="menu-item"><img src="https://image.pollinations.ai/prompt/Daiquiri%20cocktail%20lime" alt="Daiquiri"><div class="item-details"><div class="item-header"><span class="item-name">DAIQUIRI</span><span class="item-price">6,- €</span></div><span class="item-meta">0,12 l</span><div class="item-ingredients">Biely rum, cukrový sirup, limetková šťava</div></div></div>
+
+        <div class="menu-item"><img src="https://image.pollinations.ai/prompt/Orange%20vodka%20cocktail%20beach" alt="Sex on the Beach"><div class="item-details"><div class="item-header"><span class="item-name">SEX ON THE BEACH</span><span class="item-price">6,- €</span></div><span class="item-meta">0,3 l</span><div class="item-ingredients">Vodka, peach vodka, pomaranč džús, grenadína</div></div></div>
+
+        <div class="menu-item"><img src="https://image.pollinations.ai/prompt/Tequila%20Sunrise%20cocktail" alt="Tequila Sunrise"><div class="item-details"><div class="item-header"><span class="item-name">TEQUILA SUNRISE</span><span class="item-price">6,- €</span></div><span class="item-meta">0,3 l</span><div class="item-ingredients">Tequila, grenadína, pomarančový džús</div></div></div>
+
+        <div class="menu-item"><img src="https://image.pollinations.ai/prompt/Mimosa%20cocktail%20orange" alt="Mimosa"><div class="item-details"><div class="item-header"><span class="item-name">MIMOSA</span><span class="item-price">4,- €</span></div><span class="item-meta">0,2 l</span><div class="item-ingredients">Prosecco, pomarančový džús</div></div></div>
+
+        <div class="menu-item"><img src="https://image.pollinations.ai/prompt/French%2075%20cocktail" alt="French 75"><div class="item-details"><div class="item-header"><span class="item-name">FRENCH 75</span><span class="item-price">5,5 €</span></div><span class="item-meta">0,12 l</span><div class="item-ingredients">Gin, prosecco, cukrový sirup, citrón</div></div></div>
+
+        <div class="menu-item"><img src="https://image.pollinations.ai/prompt/Whiskey%20Sour%20cocktail" alt="Whisky Sour"><div class="item-details"><div class="item-header"><span class="item-name">WHISKY SOUR</span><span class="item-price">5,5 €</span></div><span class="item-meta">0,1 l</span><div class="item-ingredients">Whisky, limetka, citrón, sirup</div></div></div>
         
-        <div class="hero-content text-center px-4 max-w-6xl mx-auto">
-             <h1 class="hero-title mb-6">
-                <span class="text-gradient">LAMBADA</span><br>
-                <div class="flex justify-center mb-4"><img src="img/la.jpg" alt="Logo" class="h-24 rounded-full border-2 border-red-600"></div>
-                <span class="text-white text-4xl md:text-6xl">Digital Energy Bar</span>
-            </h1>
-            
-            <p class="hero-subtitle text-white mb-4 text-xl md:text-2xl font-bold">
-                Your Vibe. Your Rules. Your Place.
-            </p>
+        <div class="menu-item"><img src="https://image.pollinations.ai/prompt/Pink%20gin%20cocktail%20cream" alt="Anjelova Ziara"><div class="item-details"><div class="item-header"><span class="item-name">ANJELOVA ŽIARA</span><span class="item-price">5,5 €</span></div><span class="item-meta">0,1 l</span><div class="item-ingredients">Grenadína, triple sec, gin, šľahačka</div></div></div>
+    </section>
 
-            <p class="hero-subtitle text-muted mb-8 max-w-3xl mx-auto">
-                Сучасний простір для спільноти UA/SK<br>
-                Digital Energy • Ігровий майданчик • Соціальний Хаб
-            </p>
-            
-            <div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
-                <button onclick="window.location.href='play.html'" class="px-8 py-4 bg-red-600 text-white rounded-full hover:bg-red-700 transition-all hover-lift pulse-glow">
-                    🎲 PLAY
-                </button>
-                <button onclick="window.location.href='vibe.html'" class="px-8 py-4 bg-gray-800 text-white rounded-full hover:bg-red-600 transition-all hover-lift">
-                    ✨ VIBE
-                </button>
-                <button onclick="window.location.href='hub.html'" class="px-8 py-4 bg-gray-800 text-white rounded-full hover:bg-red-600 transition-all hover-lift">
-                    🌐 HUB
-                </button>
-            </div>
+    <section id="shots">
+        <h2 class="category-title">2. Shots</h2>
+
+        <div class="menu-item"><img src="https://image.pollinations.ai/prompt/B52%20shot%20layered%20drink" alt="B-52"><div class="item-details"><div class="item-header"><span class="item-name">B-52</span><span class="item-price">2,5 €</span></div><div class="item-ingredients">Kávový likér, Baileys, absinth</div></div></div>
+
+        <div class="menu-item"><img src="https://image.pollinations.ai/prompt/layered%20cream%20shot%20drink" alt="Blow Job"><div class="item-details"><div class="item-header"><span class="item-name">Blow Job</span><span class="item-price">3,- €</span></div><div class="item-ingredients">Kávový likér, Baileys, šľahačka</div></div></div>
+
+        <div class="menu-item"><img src="https://image.pollinations.ai/prompt/peach%20vodka%20shot" alt="Solar Kiss"><div class="item-details"><div class="item-header"><span class="item-name">Solar Kiss</span><span class="item-price">2,5 €</span></div><div class="item-ingredients">Peach vodka, limetkový sirup, limetka</div></div></div>
+
+        <div class="menu-item"><img src="https://image.pollinations.ai/prompt/rum%20shot%20lime" alt="Storm"><div class="item-details"><div class="item-header"><span class="item-name">Storm</span><span class="item-price">2,5 €</span></div><div class="item-ingredients">Biely rum, limetkový sirup, citrón</div></div></div>
+
+        <div class="menu-item"><img src="https://image.pollinations.ai/prompt/jagermeister%20red%20bull%20shot" alt="Dark Energy"><div class="item-details"><div class="item-header"><span class="item-name">Dark Energy</span><span class="item-price">2,5 €</span></div><div class="item-ingredients">Jägermeister, Red Bull</div></div></div>
+
+        <div class="menu-item"><img src="https://image.pollinations.ai/prompt/red%20spicy%20vodka%20shot" alt="Diablov dotyk"><div class="item-details"><div class="item-header"><span class="item-name">Diablov dotyk</span><span class="item-price">3,- €</span></div><div class="item-ingredients">Vodka, absinth, tabasko</div></div></div>
+
+        <div class="menu-item"><img src="https://image.pollinations.ai/prompt/green%20vodka%20shot" alt="Acid"><div class="item-details"><div class="item-header"><span class="item-name">Acid</span><span class="item-price">3,- €</span></div><div class="item-ingredients">Vodka, šťava citrónová, limetkový sirup</div></div></div>
+
+        <div class="menu-item"><img src="https://image.pollinations.ai/prompt/orange%20shot%20alcohol" alt="Orange Bullet"><div class="item-details"><div class="item-header"><span class="item-name">Orange Bullet</span><span class="item-price">2,5 €</span></div><div class="item-ingredients">Vodka, Martini Fiero, limetkový sirup</div></div></div>
+
+        <div class="menu-item"><img src="https://image.pollinations.ai/prompt/baileys%20shot%20red%20drop" alt="Bradavka"><div class="item-details"><div class="item-header"><span class="item-name">Bradavka</span><span class="item-price">3,- €</span></div><div class="item-ingredients">Baileys, sambuca, grenadína</div></div></div>
+
+        <div class="menu-item"><img src="https://image.pollinations.ai/prompt/gin%20shot%20clear" alt="Buchana"><div class="item-details"><div class="item-header"><span class="item-name">Buchana</span><span class="item-price">2,- €</span></div><div class="item-ingredients">Borovička, Sprite</div></div></div>
+
+        <div class="set-box">
+            <h3>SÉTY (Výhodné sady)</h3>
+            <p><strong>TOP-SHOT:</strong> (B-52, 2x Blow Job, 2x Orange Bullet) — <span class="set-price">16 €</span></p>
+            <p><strong>FATAL:</strong> (2x Bradavka, 2x Acid, Diablov dotyk) — <span class="set-price">16 €</span></p>
         </div>
     </section>
 
-    <section class="py-20 px-4">
-        <div class="max-w-7xl mx-auto">
-            <h2 class="section-title text-center mb-16 text-gradient">Три виміри LAMBADA</h2>
-            
-            <div class="grid md:grid-cols-3 gap-8">
-                <div class="pillar-card rounded-2xl p-8 hover-lift">
-                    <div class="text-6xl mb-6 text-center">🎲</div>
-                    <h3 class="text-3xl font-bold mb-4 text-center text-gradient">PLAY</h3>
-                    <p class="text-muted mb-6 text-center">Fast Dopamine / Level Up</p>
-                    
-                    <div class="space-y-4">
-                        <div class="flex items-center space-x-3">
-                            <i class="fas fa-chess text-red-500"></i>
-                            <span>Checkers & Alias</span>
-                        </div>
-                        <div class="flex items-center space-x-3">
-                             <i class="fas fa-cocktail text-red-500"></i>
-                            <span>Insta-Ready Drinks</span>
-                        </div>
-                        <div class="flex items-center space-x-3">
-                            <i class="fas fa-trophy text-red-500"></i>
-                            <span>Турніри & Призи</span>
-                        </div>
-                    </div>
-                    
-                    <button onclick="window.location.href='play.html'" class="w-full mt-6 px-6 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors">
-                        ➡️ Вривайся у гру
-                    </button>
-                </div>
+    <section id="alcohol">
+        <h2 class="category-title">3. Alkohol (Liehoviny)</h2>
 
-                <div class="pillar-card rounded-2xl p-8 hover-lift">
-                    <div class="text-6xl mb-6 text-center">✨</div>
-                    <h3 class="text-3xl font-bold mb-4 text-center text-gradient">VIBE</h3>
-                    <p class="text-muted mb-6 text-center">Digital Energy / Саундтрек</p>
-                    
-                    <div class="space-y-4">
-                        <div class="flex items-center space-x-3">
-                            <i class="fas fa-music text-red-500"></i>
-                            <span>Tech House & Lounge</span>
-                        </div>
-                        <div class="flex items-center space-x-3">
-                            <i class="fas fa-bolt text-red-500"></i>
-                            <span>RGB Aesthetic</span>
-                        </div>
-                        <div class="flex items-center space-x-3">
-                        <i class="fas fa-mobile-alt text-red-500"></i>
-                            <span>Content Zone</span>   
-                        </div>
-                    </div>
-                    
-                    <button onclick="window.location.href='vibe.html'" class="w-full mt-6 px-6 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors">
-                        ➡️ Відчуй ритм
-                    </button>
-                </div>
+        <h3 class="subcategory-title">Vodka</h3>
+        <div class="menu-item"><img src="https://image.pollinations.ai/prompt/Absolut%20vodka%20bottle" alt="Absolut"><div class="item-details"><div class="item-header"><span class="item-name">Absolut Vodka 40%</span><span class="item-price">2,6 €</span></div></div></div>
+        <div class="menu-item"><img src="https://image.pollinations.ai/prompt/Finlandia%20vodka%20bottle" alt="Finlandia"><div class="item-details"><div class="item-header"><span class="item-name">Finlandia Vodka 40%</span><span class="item-price">2,5 €</span></div></div></div>
+        <div class="menu-item"><img src="https://image.pollinations.ai/prompt/Nikolaus%20vodka%20bottle" alt="Nikolaus"><div class="item-details"><div class="item-header"><span class="item-name">Nikolaus Vodka 38%</span><span class="item-price">2,3 €</span></div></div></div>
 
-                <div class="pillar-card rounded-2xl p-8 hover-lift">
-                    <div class="text-6xl mb-6 text-center">🌐</div>
-                    <h3 class="text-3xl font-bold mb-4 text-center text-gradient">HUB</h3>
-                    <p class="text-muted mb-6 text-center">Connect & Create</p>
-                    
-                    <div class="space-y-4">
-                        <div class="flex items-center space-x-3">
-                            <i class="fas fa-handshake text-red-500"></i>
-                            <span>Нетворкінг</span>
-                        </div>
-                        <div class="flex items-center space-x-3">
-                            <i class="fas fa-calendar-alt text-red-500"></i>
-                            <span>Календар Подій</span>
-                        </div>
-                        <div class="flex items-center space-x-3">
-                            <i class="fas fa-users text-red-500"></i>
-                            <span>UA/SK Спільнота</span>
-                        </div>
-                    </div>
-                    
-                    <button onclick="window.location.href='hub.html'" class="w-full mt-6 px-6 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors">
-                        ➡️ Знайди своїх
-                    </button>
-                </div>
-            </div>
-        </div>
+        <h3 class="subcategory-title">Gin</h3>
+        <div class="menu-item"><img src="https://image.pollinations.ai/prompt/Kensington%20Gin%20bottle" alt="Kensington"><div class="item-details"><div class="item-header"><span class="item-name">Kensington London 37,5%</span><span class="item-price">1,9 €</span></div></div></div>
+        <div class="menu-item"><img src="https://image.pollinations.ai/prompt/Pink%20Gin%20bottle" alt="Kensington Pink"><div class="item-details"><div class="item-header"><span class="item-name">Kensington Pink 37,5%</span><span class="item-price">1,9 €</span></div></div></div>
+        <div class="menu-item"><img src="https://image.pollinations.ai/prompt/Beefeater%20Gin%20bottle" alt="Beefeater"><div class="item-details"><div class="item-header"><span class="item-name">Beefeater London 40%</span><span class="item-price">2,5 €</span></div></div></div>
+        <div class="menu-item"><img src="https://image.pollinations.ai/prompt/Beefeater%20Pink%20Gin%20bottle" alt="Beefeater Pink"><div class="item-details"><div class="item-header"><span class="item-name">Beefeater Pink 37,5%</span><span class="item-price">2,5 €</span></div></div></div>
+
+        <h3 class="subcategory-title">Rum</h3>
+        <div class="menu-item"><img src="https://image.pollinations.ai/prompt/Havana%20Club%20Rum%20bottle" alt="Havana"><div class="item-details"><div class="item-header"><span class="item-name">Havana Club 3 Años</span><span class="item-price">2,7 €</span></div></div></div>
+        <div class="menu-item"><img src="https://image.pollinations.ai/prompt/Bozkov%20Rum%20bottle" alt="Bozkov"><div class="item-details"><div class="item-header"><span class="item-name">Božkov Dark Rum 38%</span><span class="item-price">2,5 €</span></div></div></div>
+        <div class="menu-item"><img src="https://image.pollinations.ai/prompt/Diplomatico%20Rum%20bottle" alt="Diplomatico"><div class="item-details"><div class="item-header"><span class="item-name">Diplomatico Rum 40%</span><span class="item-price">5,2 €</span></div></div></div>
+
+        <h3 class="subcategory-title">Tequila</h3>
+        <div class="menu-item"><img src="https://image.pollinations.ai/prompt/silver%20tequila%20bottle" alt="Silver"><div class="item-details"><div class="item-header"><span class="item-name">Olé/Olmeca Silver</span><span class="item-price">1,9 € / 3,5 €</span></div></div></div>
+        <div class="menu-item"><img src="https://image.pollinations.ai/prompt/gold%20tequila%20bottle" alt="Gold"><div class="item-details"><div class="item-header"><span class="item-name">Olé/Olmeca Gold</span><span class="item-price">1,9 € / 3,5 €</span></div></div></div>
+
+        <h3 class="subcategory-title">Whiskey</h3>
+        <div class="menu-item"><img src="https://image.pollinations.ai/prompt/Johnnie%20Walker%20Red%20Label%20bottle" alt="Walker"><div class="item-details"><div class="item-header"><span class="item-name">Johnnie Walker Red</span><span class="item-price">3,- €</span></div></div></div>
+        <div class="menu-item"><img src="https://image.pollinations.ai/prompt/Jim%20Beam%20Bourbon%20bottle" alt="Jim Beam"><div class="item-details"><div class="item-header"><span class="item-name">Jim Beam Bourbon</span><span class="item-price">3,2 €</span></div></div></div>
+        <div class="menu-item"><img src="https://image.pollinations.ai/prompt/Tullamore%20Dew%20bottle" alt="Tullamore"><div class="item-details"><div class="item-header"><span class="item-name">Tullamore D.E.W.</span><span class="item-price">3,- €</span></div></div></div>
+        <div class="menu-item"><img src="https://image.pollinations.ai/prompt/Jameson%20Whiskey%20bottle" alt="Jameson"><div class="item-details"><div class="item-header"><span class="item-name">Jameson Irish</span><span class="item-price">3,5 €</span></div></div></div>
+
+        <h3 class="subcategory-title">Brandy & Borovička</h3>
+        <div class="menu-item"><img src="https://image.pollinations.ai/prompt/Metaxa%20bottle" alt="Metaxa"><div class="item-details"><div class="item-header"><span class="item-name">Metaxa 5*</span><span class="item-price">2,5 €</span></div></div></div>
+        <div class="menu-item"><img src="https://image.pollinations.ai/prompt/Karpatske%20Brandy%20bottle" alt="KB"><div class="item-details"><div class="item-header"><span class="item-name">Karpatské Brandy</span><span class="item-price">3,- €</span></div></div></div>
+        <div class="menu-item"><img src="https://image.pollinations.ai/prompt/Slovak%20Borovicka%20bottle" alt="Borovicka"><div class="item-details"><div class="item-header"><span class="item-name">Slovenská/Spišská Borovička</span><span class="item-price">2,2 €</span></div></div></div>
     </section>
 
-    <section class="py-20 px-4 bg-secondary-dark">
-        <div class="max-w-7xl mx-auto">
-            <h2 class="section-title text-center mb-16 text-gradient">Наш Instagram</h2>
-            <p class="text-center text-muted mb-12 max-w-3xl mx-auto">
-                Слідкуйте за нами в Instagram <a href="https://instagram.com/lambada.kosice" class="text-red-500 hover:underline">@lambada_ua</a> 
-                та використовуйте хештег <span class="text-red-500">#LAMBADA.Kosice</span>. 
-                <br>Локація: <a href="https://maps.app.goo.gl/dGif3oTyHX9NQU5P8" class="text-blue-500 hover:underline">Mäsiarska 50, 040 01 Košice</a>
-            </p>
-            
-            <div class="instagram-feed mb-12">
-                <div class="instagram-item">
-                    <img src="img/KOSH_1.jpg" alt="Nightlife">
-                    <div class="instagram-overlay">
-                        <div class="text-center">
-                            <i class="fab fa-instagram text-3xl text-white mb-2"></i>
-                            <p class="text-white">Нічне життя</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="instagram-item">
-                    <img src="img/play_4.jpg" alt="Board Games">
-                    <div class="instagram-overlay">
-                        <div class="text-center">
-                            <i class="fab fa-instagram text-3xl text-white mb-2"></i>
-                            <p class="text-white">Ігри</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="instagram-item">
-                    <img src="img/vibe_2.jpg" alt="Cocktails">
-                    <div class="instagram-overlay">
-                        <div class="text-center">
-                            <i class="fab fa-instagram text-3xl text-white mb-2"></i>
-                            <p class="text-white">Коктейлі</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="instagram-item">
-                    <img src="img/hub_2.jpg" alt="Music">
-                    <div class="instagram-overlay">
-                        <div class="text-center">
-                            <i class="fab fa-instagram text-3xl text-white mb-2"></i>
-                            <p class="text-white">Музика</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+    <section id="liqueurs">
+        <h2 class="category-title">4. Likéry / Liehoviny</h2>
+        
+        <div class="menu-item"><img src="https://image.pollinations.ai/prompt/peach%20liqueur%20bottle" alt="Peach"><div class="item-details"><div class="item-header"><span class="item-name">Peach Liqueur 21%</span><span class="item-price">2,- €</span></div></div></div>
+        <div class="menu-item"><img src="https://image.pollinations.ai/prompt/campari%20bottle" alt="Campari"><div class="item-details"><div class="item-header"><span class="item-name">Campari Bitter 25%</span><span class="item-price">3,- €</span></div></div></div>
+        <div class="menu-item"><img src="https://image.pollinations.ai/prompt/malibu%20rum%20bottle" alt="Malibu"><div class="item-details"><div class="item-header"><span class="item-name">Malibu 21%</span><span class="item-price">2,5 €</span></div></div></div>
+        <div class="menu-item"><img src="https://image.pollinations.ai/prompt/Martini%20Fiero%20bottle" alt="Martini"><div class="item-details"><div class="item-header"><span class="item-name">Martini Fiero 15%</span><span class="item-price">2,5 €</span></div></div></div>
+        <div class="menu-item"><img src="https://image.pollinations.ai/prompt/Tatratea%20bottle" alt="Tatratea"><div class="item-details"><div class="item-header"><span class="item-name">Tatratea original 52%</span><span class="item-price">2,8 €</span></div></div></div>
+        <div class="menu-item"><img src="https://image.pollinations.ai/prompt/Jagermeister%20bottle" alt="Jager"><div class="item-details"><div class="item-header"><span class="item-name">Jägermeister / Orange</span><span class="item-price">2,5 €</span></div></div></div>
+        <div class="menu-item"><img src="https://image.pollinations.ai/prompt/Baileys%20bottle" alt="Baileys"><div class="item-details"><div class="item-header"><span class="item-name">Baileys 17%</span><span class="item-price">2,5 €</span></div></div></div>
+        <div class="menu-item"><img src="https://image.pollinations.ai/prompt/Becherovka%20bottle" alt="Becherovka"><div class="item-details"><div class="item-header"><span class="item-name">Becherovka 38%</span><span class="item-price">2,5 €</span></div></div></div>
+        <div class="menu-item"><img src="https://image.pollinations.ai/prompt/Fernet%20Stock%20bottle" alt="Fernet"><div class="item-details"><div class="item-header"><span class="item-name">Fernet Stock / Citrus</span><span class="item-price">2,2 €</span></div></div></div>
+        <div class="menu-item"><img src="https://image.pollinations.ai/prompt/Absinth%20green%20bottle" alt="Absinth"><div class="item-details"><div class="item-header"><span class="item-name">Absinth 70%</span><span class="item-price">3,5 €</span></div></div></div>
     </section>
 
-    <section class="py-20 px-4">
-        <div class="max-w-7xl mx-auto">
-            <div class="text-center mb-16">
-                <h2 class="section-title text-gradient">Live Feed</h2>
-                <p class="text-muted mt-4">Настрій міста та наших гостей. Оновлюється щомиті.</p>
-            </div>
-            
-            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4" id="insta-grid">
-                </div>
-            
-            <div class="text-center mt-12">
-                <a href="https://instagram.com/LAMBADA.kosice" target="_blank" class="inline-flex items-center px-8 py-4 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-full hover:from-purple-700 hover:to-pink-700 transition-all hover-lift">
-                    <i class="fab fa-instagram mr-3"></i>
-                    Підписатися
-                </a>
-            </div>
-        </div>
+    <section id="wine-beer">
+        <h2 class="category-title">5. Víno & Pivo</h2>
+        
+        <div class="menu-item"><img src="https://image.pollinations.ai/prompt/glass%20of%20prosecco" alt="Prosecco"><div class="item-details"><div class="item-header"><span class="item-name">Prosecco</span><span class="item-price">1,2 €</span></div><span class="item-meta">0,1 l</span></div></div>
+        <div class="menu-item"><img src="https://image.pollinations.ai/prompt/glass%20of%20red%20wine" alt="Red Wine"><div class="item-details"><div class="item-header"><span class="item-name">Červené víno</span><span class="item-price">1,6 €</span></div><span class="item-meta">0,1 l</span></div></div>
+        <div class="menu-item"><img src="https://image.pollinations.ai/prompt/glass%20of%20white%20wine" alt="White Wine"><div class="item-details"><div class="item-header"><span class="item-name">Biele víno</span><span class="item-price">1,6 €</span></div><span class="item-meta">0,1 l</span></div></div>
+
+        <h3 class="subcategory-title">Pivo</h3>
+        <div class="menu-item"><img src="https://image.pollinations.ai/prompt/Pilsner%20Urquell%20beer%20bottle" alt="Pilsner"><div class="item-details"><div class="item-header"><span class="item-name">Pilsner Urquell 12° (Fľaša)</span><span class="item-price">2,5 €</span></div></div></div>
+        <div class="menu-item"><img src="https://image.pollinations.ai/prompt/non%20alcoholic%20beer%20bottle" alt="Birell"><div class="item-details"><div class="item-header"><span class="item-name">Birell 0%</span><span class="item-price">2,- €</span></div></div></div>
+        <div class="menu-item"><img src="https://image.pollinations.ai/prompt/draft%20beer%20glass" alt="Draft Pilsner"><div class="item-details"><div class="item-header"><span class="item-name">Pilsner Urquell (Čapované)</span><span class="item-price">2,2 / 2,9 €</span></div></div></div>
+        <div class="menu-item"><img src="https://image.pollinations.ai/prompt/dark%20beer%20glass" alt="Saris"><div class="item-details"><div class="item-header"><span class="item-name">Šariš tmavý 12° (Čapované)</span><span class="item-price">2,- / 2,5 €</span></div></div></div>
+        <div class="menu-item"><img src="https://image.pollinations.ai/prompt/kofola%20glass%20drink" alt="Kofola"><div class="item-details"><div class="item-header"><span class="item-name">Kofola original</span><span class="item-price">0,5 - 2,2 €</span></div></div></div>
     </section>
 
-    <nav class="nav-bottom glass-effect rounded-full px-6 py-3">
-        <div class="flex items-center space-x-6">
-            <button onclick="window.location.href='index.html'" class="flex items-center space-x-2 text-red-500 hover:text-red-400 transition-colors">
-                <i class="fas fa-home"></i>
-                <span class="hidden sm:inline">Головна</span>
-            </button>
-            <button onclick="window.location.href='play.html'" class="flex items-center space-x-2 text-gray-400 hover:text-red-400 transition-colors">
-                <i class="fas fa-gamepad"></i>
-                <span class="hidden sm:inline">PLAY</span>
-            </button>
-            <button onclick="window.location.href='vibe.html'" class="flex items-center space-x-2 text-gray-400 hover:text-red-400 transition-colors">
-                <i class="fas fa-music"></i>
-                <span class="hidden sm:inline">VIBE</span>
-            </button>
-            <button onclick="window.location.href='hub.html'" class="flex items-center space-x-2 text-gray-400 hover:text-red-400 transition-colors">
-                <i class="fas fa-users"></i>
-                <span class="hidden sm:inline">HUB</span>
-            </button>
-        </div>
-    </nav>
+    <section id="soft">
+        <h2 class="category-title">6. Nealko</h2>
+        <div class="menu-item"><img src="https://image.pollinations.ai/prompt/Coca%20Cola%20glass" alt="Cola"><div class="item-details"><div class="item-header"><span class="item-name">Coca-Cola / Zero</span><span class="item-price">2,6 €</span></div></div></div>
+        <div class="menu-item"><img src="https://image.pollinations.ai/prompt/Fanta%20glass" alt="Fanta"><div class="item-details"><div class="item-header"><span class="item-name">Fanta / Sprite / Tonic</span><span class="item-price">2,6 €</span></div></div></div>
+        <div class="menu-item"><img src="https://image.pollinations.ai/prompt/mineral%20water%20glass" alt="Romer"><div class="item-details"><div class="item-header"><span class="item-name">Romer quelle</span><span class="item-price">2,6 €</span></div></div></div>
+        <div class="menu-item"><img src="https://image.pollinations.ai/prompt/water%20lemon%20mint" alt="Limonada"><div class="item-details"><div class="item-header"><span class="item-name">Voda s citrónom a mäta</span><span class="item-price">0,5 - 3 €</span></div></div></div>
+        <div class="menu-item"><img src="https://image.pollinations.ai/prompt/red%20bull%20can" alt="Red Bull"><div class="item-details"><div class="item-header"><span class="item-name">Red Bull</span><span class="item-price">3,- €</span></div></div></div>
+        <div class="menu-item"><img src="https://image.pollinations.ai/prompt/fruit%20juice%20glass" alt="Juice"><div class="item-details"><div class="item-header"><span class="item-name">Džúsy (rôzne)</span><span class="item-price">2,6 €</span></div></div></div>
+    </section>
 
-    <script>
-        // Initialize Vanta.js (Birds Effect)
-        try {
-            VANTA.BIRDS({
-                el: "#vanta-bg",
-                mouseControls: true,
-                touchControls: true,
-                gyroControls: false,
-                minHeight: 200.00,
-                minWidth: 200.00,
-                scale: 1.00,
-                scaleMobile: 1.00,
-                backgroundColor: 0x0a0a0a,
-                color1: 0xdc2626, 
-                color2: 0x1a1a1a,
-                colorMode: "variance",
-                birdSize: 1.20,
-                wingSpan: 25.00,
-                speedLimit: 4.00,
-                separation: 20.00,
-                alignment: 20.00,
-                cohesion: 20.00,
-                quantity: 3.00
-            });
-        } catch(e) { console.log("Vanta JS Error:", e); }
+    <section id="snacks">
+        <h2 class="category-title">7. Pochutinky</h2>
+        <div class="menu-item"><img src="https://image.pollinations.ai/prompt/Nachos%20chips" alt="Nachos"><div class="item-details"><div class="item-header"><span class="item-name">Nachos</span><span class="item-price">5,- €</span></div></div></div>
+        <div class="menu-item"><img src="https://image.pollinations.ai/prompt/potato%20chips%20bowl" alt="Lupienky"><div class="item-details"><div class="item-header"><span class="item-name">Lupienky</span><span class="item-price">2,5 €</span></div></div></div>
+        <div class="menu-item"><img src="https://image.pollinations.ai/prompt/peanuts%20bowl" alt="Arasidy"><div class="item-details"><div class="item-header"><span class="item-name">Arašidy</span><span class="item-price">2,5 €</span></div></div></div>
+        <div class="menu-item"><img src="https://image.pollinations.ai/prompt/pistachio%20bowl" alt="Pistacie"><div class="item-details"><div class="item-header"><span class="item-name">Pistácie</span><span class="item-price">3,5 €</span></div></div></div>
+        <div class="menu-item"><img src="https://image.pollinations.ai/prompt/salty%20sticks" alt="Tycinky"><div class="item-details"><div class="item-header"><span class="item-name">Tyčinky</span><span class="item-price">2,5 €</span></div></div></div>
+        <div class="menu-item"><img src="https://image.pollinations.ai/prompt/olives%20bowl" alt="Olivy"><div class="item-details"><div class="item-header"><span class="item-name">Olivy (zelené/čierne)</span><span class="item-price">2,- €</span></div></div></div>
+        <div class="menu-item"><img src="https://image.pollinations.ai/prompt/kabanos%20sausage" alt="Kabanosy"><div class="item-details"><div class="item-header"><span class="item-name">Kabanosy</span><span class="item-price">2,- €</span></div></div></div>
+    </section>
 
-        // --- DYNAMIC FEED LOGIC ---
-        const feedKeywords = [
-            'kosice,city', 'cocktails,bar',''
-        ];
+</div>
 
-        function renderDynamicFeed() {
-            const grid = document.getElementById('insta-grid');
-            if (!grid) return;
-            
-            let htmlContent = '';
-            for(let i = 0; i < 8; i++) {
-                const keyword = feedKeywords[i % feedKeywords.length];
-                const randomSeed = Math.floor(Math.random() * 1000);
-                const imgUrl = `https://loremflickr.com/400/400/${keyword}?lock=${randomSeed}`;
-                
-                const likes = Math.floor(Math.random() * 200) + 50;
-                const comments = Math.floor(Math.random() * 20) + 2;
+<footer>
+    <p>&copy; 2024 LYMBADA Menu. Všetky ceny sú vrátane DPH.</p>
+</footer>
 
-                htmlContent += `
-                <a href="https://instagram.com/LAMBADA.kosice" target="_blank" class="insta-card">
-                    <img src="${imgUrl}" alt="Live Feed">
-                    <div class="insta-overlay-dynamic">
-                        <div><i class="fas fa-heart mr-2"></i> ${likes}</div>
-                        <div><i class="fas fa-comment mr-2"></i> ${comments}</div>
-                    </div>
-                </a>
-                `;
-            }
-            grid.innerHTML = htmlContent;
-        }
-
-        renderDynamicFeed();
-
-        // Language Switch (Visual)
-        document.getElementById('lang-ua').addEventListener('click', function() {
-            this.classList.add('bg-red-600');
-            this.classList.remove('bg-gray-700');
-            document.getElementById('lang-sk').classList.add('bg-gray-700');
-            document.getElementById('lang-sk').classList.remove('bg-red-600');
-        });
-
-        document.getElementById('lang-sk').addEventListener('click', function() {
-            this.classList.add('bg-red-600');
-            this.classList.remove('bg-gray-700');
-            document.getElementById('lang-ua').classList.add('bg-gray-700');
-            document.getElementById('lang-ua').classList.remove('bg-red-600');
-        });
-
-        // Navigation Scroll Effect
-        window.addEventListener('scroll', function() {
-            const nav = document.querySelector('.nav-bottom');
-            if (window.scrollY > 100) {
-                nav.style.opacity = '0.9';
-            } else {
-                nav.style.opacity = '1';
-            }
-        });
-    </script>
 </body>
 </html>
